@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/Gates">
+        <file>qmldir</file>
+        <file>GAnd.qml</file>
+        <file>Gate.qml</file>
+        <file>GOr.qml</file>
+        <file>GXor.qml</file>
+        <file>gatesLib.js</file>
+    </qresource>
+</RCC>

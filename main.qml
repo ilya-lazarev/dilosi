@@ -1,0 +1,297 @@
+import QtQml 2.15
+import QtQuick 2.15
+//import Qt.labs.platform 1.1 as Pl
+import QtQuick.Controls 2.15
+import QtQuick.Window 2.15
+import QtQuick.Layouts 1.3
+import Gates 1.0 as Gates
+import 'Gates/gatesLib.js' as GL
+
+ApplicationWindow {
+    id: mainWin
+    width: 1024
+    height: 800
+    visible: true
+
+    title: qsTr("Hello World")
+    property int menuHeight: 16
+    property int iconSize: 24
+
+    function newGate(type) {
+        var g;
+
+        console.log(type)
+        switch(type) {
+        case Gates.And:
+            g = GL.createGandObject(ii, {x: 10, y: 25})
+            break;
+        case Gates.Or:
+            g = GL.createGorObject(ii, {x: 10, y: 25})
+            break;
+        case Gates.Xor:
+            g = GL.createGxorObject(ii, {x: 10, y: 25})
+            break;
+        default:
+            return null;
+            break;
+        }
+        ii.gates.push(g)
+        return g;
+    }
+
+    Action {
+        id: acFileOpen
+        text: qsTr("&Open")
+        shortcut: 'Ctrl+O'
+        onTriggered: console.log("OpenFile")
+        icon {
+            source: 'qrc:/img/24x24/fileopen.png'
+        }
+    }
+
+    Action {
+        id: acFileSave
+        text: qsTr("&Save")
+        shortcut: 'Ctrl+S'
+        onTriggered: {
+            console.log("SaveFile")
+        }
+        icon {
+            source: 'qrc:/img/24x24/filesave.png'
+        }
+    }
+
+    Action {
+        id: acAppExit
+        text: qsTr("&Quit")
+        shortcut: 'Ctrl+Q'
+        onTriggered: Qt.quit()
+        icon {
+            source: 'qrc:/img/24x24/finish.png'
+        }
+    }
+
+    Action {
+        id: acAddAndGate
+        text: qsTr("Add (N)AND gate")
+        onTriggered: newGate(Gates.Gate.And)
+        shortcut: 'Ctrl+1'
+        icon {
+            source: 'qrc:/img/24x24/andGate.png'
+            color: 'transparent'
+        }
+    }
+    Action {
+        id: acAddOrGate
+        text: qsTr("Add (N)OR gate")
+        onTriggered: newGate(Gates.Or)
+        shortcut: 'Ctrl+2'
+        icon {
+            source: 'qrc:/img/24x24/orGate.png'
+            color: 'transparent'
+        }
+    }
+    Action {
+        id: acAddXorGate
+        text: qsTr("Add (N)XOR gate")
+        onTriggered: newGate(Gates.Xor)
+        shortcut: 'Ctrl+3'
+        icon {
+            source: 'qrc:/img/24x24/xorGate.png'
+            color: 'transparent'
+        }
+    }
+
+    menuBar: MenuBar {
+        id: menuBar
+        Layout.margins: 0
+        Menu {
+            title: qsTr("&File")
+            MenuItem {
+                action: acFileOpen
+                font.pointSize: 10
+                icon.color: "transparent"
+            }
+            MenuItem {
+                action: acFileSave
+                font.pointSize: 10
+                icon.color: "transparent"
+            }
+            MenuSeparator {}
+            MenuItem {
+                action: acAppExit
+                icon.color: "transparent"
+            }
+        }
+    }
+
+    header: ToolBar {
+        id: toolBar
+        Layout.margins: 0
+        Layout.fillWidth: true
+        RowLayout {
+            ToolButton {
+                action: acFileOpen
+                display: AbstractButton.IconOnly
+                icon.color: "transparent"
+            }
+            ToolButton {
+                action: acFileSave
+                display: AbstractButton.IconOnly
+                icon.color: "transparent"
+            }
+            ToolButton {
+                action: acAppExit
+                display: AbstractButton.IconOnly
+                icon.color: "transparent"
+            }
+            ToolSeparator { }
+
+            ToolButton {
+                action: acAddAndGate
+                display: AbstractButton.IconOnly
+                icon.color: "transparent"
+            }
+            ToolButton {
+                action: acAddOrGate
+                display: AbstractButton.IconOnly
+                icon.color: "transparent"
+            }
+            ToolButton {
+                action: acAddXorGate
+                display: AbstractButton.IconOnly
+                icon.color: "transparent"
+            }
+        }
+    }
+
+    Item {
+        id: ii
+        property var gates: []
+        anchors.fill: parent
+        x: 0; y: 0
+        Rectangle {
+            x: 0; y: 0
+            anchors.fill: parent
+            color: '#77007700'
+            z: -1
+            border.color: '#88000000'
+            enabled: false
+        }
+
+        function findFromPoint(gp) {
+            for(var i in ii.gates) {
+                var c = ii.gates[i]
+                var lp = c.mapFromGlobal(gp.x, gp.y)
+                if( c.contains(lp) && c.objectName && c.objectName.startsWith("gate_")) {
+                    return c
+                }
+            }
+
+            return null
+        }
+
+        function contains(item, x, y) {
+            var p = {x: x, y: y}
+            return item.contains(p);
+        }
+
+        function checkOverlap(o) {
+            var c;
+
+            for( var i in gates ) {
+                if(o === ii.gates[i])
+                    continue;
+                c = ii.gates[i];
+
+                if(c.contains(Qt.point(o.x - c.x, o.y - c.y)))
+                    return true;
+                if(c.contains(Qt.point(o.x + o.width - c.x, o.y - c.y)))
+                    return true;
+                if(c.contains(Qt.point(o.x + o.width - c.x, o.y + o.height - c.y)))
+                    return true;
+                if(c.contains(Qt.point(o.x - c.x, o.y + o.height- c.y)))
+                    return true;
+
+                // not overlapped
+            }
+            return false;
+        }
+
+        MouseArea {
+            id: mArea
+            x: 0; y: 0
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+            hoverEnabled: true
+            property bool dragging: false
+            property var dragObj: null
+            property var op: null
+            property bool moved: false
+            property var startP: Qt.point
+
+            onPressed: {
+                moved = false
+                var g = ii.mapToGlobal(mouse.x, mouse.y)
+                var obj = ii.findFromPoint(g)
+                if(obj !== null) {
+                    dragging = true
+                    dragObj = obj
+                    startP.x = obj.x
+                    startP.y  = obj.y
+                    op = obj.mapFromGlobal(g.x, g.y)
+                }
+            }
+
+            onClicked: {
+                if( !moved ) {
+                    var g = ii.mapToGlobal(mouse.x, mouse.y)
+                    var obj = ii.findFromPoint(g)
+                    if(obj != null) {
+                        obj.selected = !obj.selected
+                    }
+                }
+                moved = false
+            }
+
+            onPositionChanged: {
+                if(dragging && dragObj) {
+                    moved = true
+                    dragObj.x = mouse.x - op.x
+                    dragObj.y = mouse.y - op.y
+                    dragObj.alert = ii.checkOverlap(dragObj)
+
+                }
+            }
+
+            onReleased: {
+                if(ii.checkOverlap(dragObj)) {
+                    dragObj.x = startP.x
+                    dragObj.y = startP.y
+                    dragObj.alert = false
+                }
+
+                dragging = false
+                dragObj = null
+                op = null
+            }
+        }
+
+
+
+/*            GAnd {
+            id: andGate
+        }
+        GOr {
+            id: orGate
+        }
+        GXor {
+            id: xorGate
+        }
+    }
+*/
+        Component.onCompleted: {
+            GL.preload();
+        }
+    }
+}

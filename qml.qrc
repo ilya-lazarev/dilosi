@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>img/24x24/filenew.png</file>
+        <file>img/24x24/fileopen.png</file>
+        <file>img/24x24/filesave.png</file>
+        <file>img/24x24/filesaveas.png</file>
+        <file>img/24x24/finish.png</file>
+        <file>img/svg/andGate.svg</file>
+        <file>img/svg/gate.svg</file>
+        <file>img/svg/orGate.svg</file>
+        <file>img/svg/xorGate.svg</file>
+        <file>img/24x24/andGate.png</file>
+        <file>img/24x24/gate.png</file>
+        <file>img/24x24/orGate.png</file>
+        <file>img/24x24/xorGate.png</file>
+    </qresource>
+</RCC>

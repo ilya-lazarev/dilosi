@@ -1,0 +1,4 @@
+module Gates
+GAnd 1.0 GAnd.qml
+GOr 1.0 GOr.qml
+GXor 1.0 GXor.qml

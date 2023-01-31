@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   sodipodi:docname="orGate.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.1946698"
+     inkscape:cx="252.42978"
+     inkscape:cy="455.64942"
+     inkscape:window-width="1858"
+     inkscape:window-height="1057"
+     inkscape:window-x="54"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Слой 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="opacity:1;fill:none;fill-opacity:0.811765;stroke:#000000;stroke-width:1.259;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect31"
+       width="43.98737"
+       height="72.289322"
+       x="61.718712"
+       y="84.223877"
+       ry="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.259;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 61.725307,99.098051 H 48.222897"
+       id="path1424" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.259;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 61.725307,138.64083 H 48.222897"
+       id="path2091" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.259;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 118.99,99.098051 H 105.48759"
+       id="path2193" />
+    <circle
+       style="opacity:1;fill:#ffffff;fill-opacity:0.991936;stroke:#000000;stroke-width:1.259;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path2453"
+       cx="105.78898"
+       cy="98.917213"
+       r="3.0742099" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:19.7659px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.494149"
+       x="67.207954"
+       y="115.30137"
+       id="text3956"><tspan
+         sodipodi:role="line"
+         id="tspan3954"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.6255px;font-family:'Georgia Pro';-inkscape-font-specification:'Georgia Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.494149"
+         x="67.207954"
+         y="115.30137">1</tspan></text>
+  </g>
+</svg>
