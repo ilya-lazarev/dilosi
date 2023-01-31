@@ -9,7 +9,7 @@ DIOlib::DIOlib(QObject *parent) : QObject(parent)
 
 void DIOlib::registerToQML()
 {
-    qmlRegisterUncreatableType<DIOlib>("gates", 1, 0, "GateType", "DIOlib internals");
+    qmlRegisterUncreatableType<DIOlib>("gates.org", 1, 0, "GateType", "DIOlib internals");
 }
 
 void DIOlib::writeConfig(QList<QObject *> *gates)

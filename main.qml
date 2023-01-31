@@ -5,7 +5,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.3
 import Gates 1.0 as Gates
-import gates 1.0
+import gates.org 1.0
 import 'Gates/gatesLib.js' as GL
 
 ApplicationWindow {
@@ -22,21 +22,9 @@ ApplicationWindow {
         var g;
 
         console.log(type)
-        switch(type) {
-        case GateType.And:
-            g = GL.createGandObject(ii, {x: 10, y: 25})
-            break;
-        case GateType.Or:
-            g = GL.createGorObject(ii, {x: 10, y: 25})
-            break;
-        case GateType.Xor:
-            g = GL.createGxorObject(ii, {x: 10, y: 25})
-            break;
-        default:
-            return null;
-            break;
-        }
-        ii.gates.push(g)
+        g = GL.createGate(type, ii, {x: 10, y: 25})
+        if(g !== null)
+            ii.gates.push(g)
         return g;
     }
 

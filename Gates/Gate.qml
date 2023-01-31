@@ -1,11 +1,9 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.5
-import gates 1.0
+import gates.org 1.0
 
 Item {
     id: root
-    implicitWidth: 50
-    implicitHeight: 60
 
     property int inputs: 2
     property bool not : true
@@ -15,6 +13,9 @@ Item {
     property bool alert: false
     property bool selected: false
     property int type: GateType.Gate
+
+    implicitWidth: 50
+    implicitHeight: type == GateType.Not ? 50 : 60
 
     Rectangle {
         id: tinter
@@ -37,6 +38,7 @@ Item {
             width: selected ? stroke * 1.5 : stroke
         }
     }
+
     Repeater {
         model: inputs
         delegate: Rectangle {
@@ -51,6 +53,7 @@ Item {
             y: root.height / (inputs+1) * (index+1)
         }
     }
+
     Rectangle {
         border {
             color: '#000000'
@@ -63,20 +66,12 @@ Item {
         y: root.height / 4
         visible: root.not
     }
+
     Label {
         text: symbol
         x: 2*rad + stroke
         y: rad
         font.pixelSize: root.height / 4
     }
-    function pinAtPoint(x,y) {
-        return {0: 'in'}
-    }
-//    Component.onCompleted: {
-//        root.grabToImage(function(result) {
-//                root.Drag.imageSource = result.url
-//                console.log(result)
-//            }
-//        )
-//    }
+
 }

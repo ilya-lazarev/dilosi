@@ -6,5 +6,6 @@
         <file>GOr.qml</file>
         <file>GXor.qml</file>
         <file>gatesLib.js</file>
+        <file>GNot.qml</file>
     </qresource>
 </RCC>
