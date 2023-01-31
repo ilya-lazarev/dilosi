@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
     }
 
     QQmlApplicationEngine engine;
-    engine.addImportPath("qrc:/");
+    engine.addImportPath("./");
+
     engine.rootContext()->setContextProperty("iolib", &iolib);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));

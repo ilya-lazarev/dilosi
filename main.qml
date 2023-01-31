@@ -4,9 +4,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.3
-import Gates 1.0 as Gates
+import Gates 1.0
 import gates.org 1.0
-import 'Gates/gatesLib.js' as GL
 
 ApplicationWindow {
     id: mainWin
@@ -21,7 +20,6 @@ ApplicationWindow {
     function newGate(type) {
         var g;
 
-        console.log(type)
         g = GL.createGate(type, ii, {x: 10, y: 25})
         if(g !== null)
             ii.gates.push(g)
@@ -91,6 +89,17 @@ ApplicationWindow {
         }
     }
 
+    Action {
+        id: acAddNotGate
+        text: qsTr("Add NOT/REPEATER gate")
+        onTriggered: newGate(GateType.Not)
+        shortcut: 'Ctrl+4'
+        icon {
+            source: 'qrc:/img/24x24/notGate.png'
+            color: 'transparent'
+        }
+    }
+
     menuBar: MenuBar {
         id: menuBar
         Layout.margins: 0
@@ -134,22 +143,42 @@ ApplicationWindow {
                 display: AbstractButton.IconOnly
                 icon.color: "transparent"
             }
+
+            // -------------------
             ToolSeparator { }
 
-            ToolButton {
+            TButton {
+                action: acAddNotGate
+                tooltip:  qsTr("Create 'not' ot repeater gate")
+            }
+            TButton {
                 action: acAddAndGate
-                display: AbstractButton.IconOnly
-                icon.color: "transparent"
+                tooltip:  qsTr("Create (N)AND gate")
             }
-            ToolButton {
+            TButton {
                 action: acAddOrGate
-                display: AbstractButton.IconOnly
-                icon.color: "transparent"
+                tooltip:  qsTr("Create (N)OR gate")
             }
-            ToolButton {
+            TButton {
                 action: acAddXorGate
-                display: AbstractButton.IconOnly
-                icon.color: "transparent"
+                tooltip:  qsTr("Create (N)XOR gate")
+            }
+            ToolSeparator { }
+            CheckBox {
+                id: notCheck
+                text: qsTr("Inverted")
+                enabled: mArea.current !== null && !mArea.dragging
+                checked: mArea.current !== null ? mArea.current.not : false
+                onToggled: if(mArea.current !== null) mArea.current.not = checked
+            }
+            SpinBox {
+                id: inPins
+
+                enabled: mArea.current !== null && !mArea.dragging
+                value: mArea.current !== null ? mArea.current.inputs : 0
+                from: 1
+                to: 8
+                onValueModified: if(mArea.current !== null) mArea.current.inputs = value
             }
         }
     }
@@ -214,17 +243,19 @@ ApplicationWindow {
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
             hoverEnabled: true
             property bool dragging: false
+            property var current: null
             property var dragObj: null
             property var op: null
             property bool moved: false
             property var startP: Qt.point
 
             onPressed: {
+                console.log("Press")
                 moved = false
                 var g = ii.mapToGlobal(mouse.x, mouse.y)
                 var obj = ii.findFromPoint(g)
                 if(obj !== null) {
-                    dragging = true
+                    dragging = false
                     dragObj = obj
                     startP.x = obj.x
                     startP.y  = obj.y
@@ -233,18 +264,37 @@ ApplicationWindow {
             }
 
             onClicked: {
-                if( !moved ) {
-                    var g = ii.mapToGlobal(mouse.x, mouse.y)
-                    var obj = ii.findFromPoint(g)
-                    if(obj != null) {
-                        obj.selected = !obj.selected
+                console.log("Clik")
+                if( dragObj && !moved ) {
+                    if( !dragObj.selected) {
+                        ii.gates.map(o => o.selected =false)
+                        dragObj.selected = true
+                        current = dragObj
+                    } else {
+                        dragObj.selected = false
+                        current = null
                     }
                 }
                 moved = false
+                dragObj = null
+            }
+
+
+            onReleased: {
+                console.log("Rls")
+                if(dragObj && ii.checkOverlap(dragObj)) {
+                    dragObj.x = startP.x
+                    dragObj.y = startP.y
+                    dragObj.alert = false
+                }
+
+                dragging = false
+                op = null
             }
 
             onPositionChanged: {
-                if(dragging && dragObj) {
+                if(dragObj) {
+                    dragging = true
                     moved = true
                     dragObj.x = mouse.x - op.x
                     dragObj.y = mouse.y - op.y
@@ -253,16 +303,8 @@ ApplicationWindow {
                 }
             }
 
-            onReleased: {
-                if(ii.checkOverlap(dragObj)) {
-                    dragObj.x = startP.x
-                    dragObj.y = startP.y
-                    dragObj.alert = false
-                }
+            onWheel: {
 
-                dragging = false
-                dragObj = null
-                op = null
             }
         }
 

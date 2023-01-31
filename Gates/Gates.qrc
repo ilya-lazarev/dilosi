@@ -7,5 +7,6 @@
         <file>GXor.qml</file>
         <file>gatesLib.js</file>
         <file>GNot.qml</file>
+        <file>TButton.qml</file>
     </qresource>
 </RCC>
