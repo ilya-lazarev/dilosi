@@ -5,6 +5,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.3
 import Gates 1.0 as Gates
+import gates 1.0
 import 'Gates/gatesLib.js' as GL
 
 ApplicationWindow {
@@ -22,13 +23,13 @@ ApplicationWindow {
 
         console.log(type)
         switch(type) {
-        case Gates.And:
+        case GateType.And:
             g = GL.createGandObject(ii, {x: 10, y: 25})
             break;
-        case Gates.Or:
+        case GateType.Or:
             g = GL.createGorObject(ii, {x: 10, y: 25})
             break;
-        case Gates.Xor:
+        case GateType.Xor:
             g = GL.createGxorObject(ii, {x: 10, y: 25})
             break;
         default:
@@ -74,7 +75,7 @@ ApplicationWindow {
     Action {
         id: acAddAndGate
         text: qsTr("Add (N)AND gate")
-        onTriggered: newGate(Gates.Gate.And)
+        onTriggered: newGate(GateType.And)
         shortcut: 'Ctrl+1'
         icon {
             source: 'qrc:/img/24x24/andGate.png'
@@ -84,7 +85,7 @@ ApplicationWindow {
     Action {
         id: acAddOrGate
         text: qsTr("Add (N)OR gate")
-        onTriggered: newGate(Gates.Or)
+        onTriggered: newGate(GateType.Or)
         shortcut: 'Ctrl+2'
         icon {
             source: 'qrc:/img/24x24/orGate.png'
@@ -94,7 +95,7 @@ ApplicationWindow {
     Action {
         id: acAddXorGate
         text: qsTr("Add (N)XOR gate")
-        onTriggered: newGate(Gates.Xor)
+        onTriggered: newGate(GateType.Xor)
         shortcut: 'Ctrl+3'
         icon {
             source: 'qrc:/img/24x24/xorGate.png'

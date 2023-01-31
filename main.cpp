@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 #endif
 
     DIOlib iolib;
-
+    iolib.registerToQML();
     QGuiApplication app(argc, argv);
 
     QTranslator translator;

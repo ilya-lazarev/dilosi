@@ -1,14 +1,11 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.5
+import gates 1.0
 
 Item {
     id: root
     implicitWidth: 50
     implicitHeight: 60
-
-    enum GateType {
-        None, And, Or, Xor
-    }
 
     property int inputs: 2
     property bool not : true
@@ -17,7 +14,7 @@ Item {
     property string symbol: '*'
     property bool alert: false
     property bool selected: false
-    property int type: Gate.None
+    property int type: GateType.Gate
 
     Rectangle {
         id: tinter
