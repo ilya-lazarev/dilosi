@@ -18,7 +18,6 @@ function preload() {
 }
 
 function createGate(type, par, args) {
-    console.log("New gate " + type)
     if(type in gatesMap) {
         var comp = gatesMap[type];
         var obj = comp.createObject(par, args);

@@ -1,6 +1,5 @@
 import QtQml 2.15
 import QtQuick 2.15
-//import Qt.labs.platform 1.1 as Pl
 import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.3
@@ -321,6 +320,14 @@ ApplicationWindow {
             return false;
         }
 
+        function updateLimits() {
+            ii.scX = Math.min(Math.max(ii.scX, 0), ii.width)
+            ii.scY = Math.min(Math.max(ii.scY, 0), ii.height)
+        }
+
+        onWidthChanged: updateLimits()
+        onHeightChanged: updateLimits()
+
         MouseArea {
             id: mArea
             x: 0; y: 0
@@ -330,11 +337,11 @@ ApplicationWindow {
             property bool dragging: false
             property var current: null
             property var dragObj: null
-            property var op: null
+            property point op: Qt.point(0,0)
             property bool moved: false
             property bool panning: false
-            property var startP: Qt.point
-            property var centerP: Qt.point
+            property point startP: Qt.point(0,0)
+            property point centerP: Qt.point(0,0)
 
             onPressed: {
                 if( mouse.button == Qt.LeftButton) {
@@ -358,7 +365,6 @@ ApplicationWindow {
                     centerP.x = ii.scX
                     centerP.y = ii.scY
                     panning = true
-                    console.log("Start pan @ " + startP + ', ' + centerP)
                 }
             }
 
@@ -389,7 +395,6 @@ ApplicationWindow {
                     }
 
                     dragging = false
-                    op = null
                 } else if(mouse.button == Qt.MiddleButton) {
                     panning = false
                 }
@@ -407,9 +412,8 @@ ApplicationWindow {
                     var p = ii.mapToGlobal(mouse.x, mouse.y)
                     p.x -= startP.x
                     p.y -= startP.y
-                    ii.scX = centerP.x - p.x * ii.scaleF
-                    ii.scY = centerP.y - p.y * ii.scaleF
-                    console.log("Delta = " + p)
+                    ii.scX = Math.min(Math.max(centerP.x - p.x * ii.scaleF, 0), ii.width)
+                    ii.scY = Math.min(Math.max(centerP.y - p.y * ii.scaleF, 0), ii.height)
                 }
 
             }
@@ -424,7 +428,6 @@ ApplicationWindow {
                     ii.scY = wheel.y
                     ii.scaleF -= .05
                 }
-                console.log(ii.scale)
             }
         }
     }
