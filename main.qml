@@ -29,7 +29,17 @@ ApplicationWindow {
         id: acFileOpen
         text: qsTr("&Open")
         shortcut: 'Ctrl+O'
-        onTriggered: console.log("OpenFile")
+        onTriggered: {
+            console.log("OpenFile")
+            var gg = iolib.loadFile();
+            console.log(gg)
+            for(var i in gg) {
+                console.log(gg[i])
+                for(var p in gg[i]) {
+                    console.log('  ' + gg[i][p])
+                }
+            }
+        }
         icon {
             source: 'qrc:/img/24x24/fileopen.png'
         }
@@ -434,6 +444,5 @@ ApplicationWindow {
 
     Component.onCompleted: {
         GL.preload();
-        ii.gates = iolib.loadFile();
     }
 }

@@ -50,6 +50,32 @@ QList<QObject *> DIOlib::loadFile()
     QFile of(dataFileName);
     QList<QObject *>  gates;
 
+    if(of.open(QFile::ReadOnly))
+    {
+        QObject *g = nullptr;
+        QJsonDocument doc(QJsonDocument::fromJson(of.readAll()));
+
+        QJsonObject jo;
+        GateType type;
+
+        const QJsonArray ja = doc.array();
+
+        for( QJsonArray::const_iterator i = ja.cbegin(); i != ja.cend(); ++i)
+        {
+            jo = i->toObject();
+            g = new QObject(this);
+            g->setProperty( "not", jo["not"].toBool() );
+            type = stringToGateType(jo["type"].toString());
+
+            g->setProperty( "type", (int)type );
+            g->setProperty( "x", jo["x"].toInt() );
+            g->setProperty( "y", jo["y"].toInt() );
+            gates.append(g);
+        }
+    }
+    else
+        qDebug() << "Error opening...";
+
     return gates;
 }
 
@@ -73,7 +99,9 @@ void DIOlib::writeFile(const QList<QObject *> &gates)
                 gate->property("type").value<int>();
         }
     }
+
     QJsonDocument doc(ja);
+
     if(of.open(QFile::WriteOnly))
     {
         of.write(doc.toJson());
