@@ -1,22 +1,29 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.5
 import gates.org 1.0
+import Gates 1.0
+//import 'gatesLib.js' 1.0 as GL
 
 Item {
     id: root
 
-    property int inputs: 2
-    property bool not : false
+    GateType { id: gt }
+    property alias gate: gt
+    property alias inv: gt.inv
+    property alias inputs: gt.inputs
     property int rad: 6
     property int stroke: 3
-    property string symbol: '*'
     property bool alert: false
     property bool selected: false
-    required property int type
     readonly property int _ofs: 4
 
     implicitWidth: 50
-    implicitHeight: type == GateLib.Not ? 50 : 60
+    implicitHeight: gate.type == GateType.Not ? 50 : 60
+    x: gt.x
+    y: gt.y
+
+    onXChanged: gt.x = x
+    onYChanged: gt.y = y
 
     // dimmer - alert,selcted
     Rectangle {
@@ -34,7 +41,7 @@ Item {
         readonly property int _pinStep: (baseRect.height - _ofs)
         color: '#00000000'
         implicitWidth: parent.width - rad*2
-        implicitHeight: type == GateLib.Not ? parent.width - rad*2 : parent.height
+        implicitHeight: gate.type == GateType.Not ? parent.width - rad*2 : parent.height
         x: rad
         y: 0
         border {
@@ -45,7 +52,7 @@ Item {
 
     // input pins
     Repeater {
-        model: inputs
+        model: gate.inputs
         delegate: Rectangle {
             color: '#00000000'
             border {
@@ -55,7 +62,7 @@ Item {
 
             width: rad
             height: stroke
-            y: _ofs + baseRect._pinStep / (inputs+1) * (index+1)
+            y: _ofs + baseRect._pinStep / (gate.inputs+1) * (index+1)
         }
     }
 
@@ -82,23 +89,16 @@ Item {
         width: rad*2
         height: width
         radius: rad
-        x: root.width - 2*rad - rad/2
+        x: root.width - 2*rad - rad/2 +1
         y: outPin.y - rad/2 - stroke/2
-        visible: root.not
+        visible: gate.inv
     }
 
     Label {
         id: label
-        text: symbol
+        text: GL.getSymbol(gate.type)
         x: 2*rad + stroke
         y: rad
         font.pixelSize: root.height / 4
     }
-
-    Label {
-        y: label.y + label.height+2
-        x: label.x
-        text: '' + root.x +',\n' + root.y
-    }
-
 }

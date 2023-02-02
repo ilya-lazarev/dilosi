@@ -4,39 +4,36 @@
 #include <QObject>
 #include <QList>
 #include <QString>
+#include <QJSValue>
+#include <QQmlApplicationEngine>
 
+#include "dgate.h"
 
 class DIOlib : public QObject
 {
     Q_OBJECT
+    typedef QMap<DGate::GateType, QString> GateTypeMap;
 
 public:
     static const QString dataFileName;
 
-    enum class GateType: int
-    {
-        None = 0, Gate,
-        Not, And, Or, Xor
-    };
-
-    Q_ENUM(GateType)
-
-    typedef QMap<GateType, QString> GateTypeMap;
 
     explicit DIOlib(QObject *parent = nullptr);
     explicit DIOlib(const DIOlib &ref) : QObject(ref.parent()) {}
     virtual ~DIOlib() {}
 
     static void registerToQML();
-    static const QString & GateTypeToString(GateType);
-    static GateType stringToGateType(const QString &);
+    static const QString & GateTypeToString(DGate::GateType);
+    static DGate::GateType stringToGateType(const QString &);
 
-    Q_INVOKABLE void writeFile(const QList<QObject *> &);
-    Q_INVOKABLE QList<QObject *> loadFile();
+    Q_INVOKABLE void writeFile(const QList<DGate *> &);
+    Q_INVOKABLE QJSValue loadFile();
+    void setEngine(QQmlApplicationEngine &);
 signals:
 
 private:
     static GateTypeMap GateType2string;
+    QQmlApplicationEngine *engine;
 };
 
 #endif // DIOLIB_H

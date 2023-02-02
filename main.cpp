@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.addImportPath("./");
+    iolib.setEngine(engine);
 
     engine.rootContext()->setContextProperty("iolib", &iolib);
 

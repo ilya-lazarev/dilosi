@@ -16,10 +16,13 @@ ApplicationWindow {
     property int menuHeight: 16
     property int iconSize: 24
 
-    function newGate(type) {
+    function newGate(type, args) {
         var g;
+        if(!args)
+            args = {type: type, x: ii.width/2, y: ii.height/2}
 
-        g = GL.createGate(type, ii, {x: ii.width/2, y: ii.height/2})
+        g = GL.createGate(ii, args)
+
         if(g !== null)
             ii.gates.push(g)
         return g;
@@ -32,12 +35,8 @@ ApplicationWindow {
         onTriggered: {
             console.log("OpenFile")
             var gg = iolib.loadFile();
-            console.log(gg)
             for(var i in gg) {
-                console.log(gg[i])
-                for(var p in gg[i]) {
-                    console.log('  ' + gg[i][p])
-                }
+                newGate(gg[i].type, gg[i])
             }
         }
         icon {
@@ -51,7 +50,7 @@ ApplicationWindow {
         shortcut: 'Ctrl+S'
         onTriggered: {
             console.log("SaveFile")
-            iolib.writeFile(ii.gates)
+            iolib.writeFile(ii.gates.map( x => x.gate ))
         }
         icon {
             source: 'qrc:/img/24x24/filesave.png'
@@ -71,7 +70,7 @@ ApplicationWindow {
     Action {
         id: acAddAndGate
         text: qsTr("Add (N)AND gate")
-        onTriggered: newGate(GateLib.And)
+        onTriggered: newGate(GateType.And)
         shortcut: 'Ctrl+1'
         icon {
             source: 'qrc:/img/24x24/andGate.png'
@@ -81,7 +80,7 @@ ApplicationWindow {
     Action {
         id: acAddOrGate
         text: qsTr("Add (N)OR gate")
-        onTriggered: newGate(GateLib.Or)
+        onTriggered: newGate(GateType.Or)
         shortcut: 'Ctrl+2'
         icon {
             source: 'qrc:/img/24x24/orGate.png'
@@ -91,7 +90,7 @@ ApplicationWindow {
     Action {
         id: acAddXorGate
         text: qsTr("Add (N)XOR gate")
-        onTriggered: newGate(GateLib.Xor)
+        onTriggered: newGate(GateType.Xor)
         shortcut: 'Ctrl+3'
         icon {
             source: 'qrc:/img/24x24/xorGate.png'
@@ -102,7 +101,7 @@ ApplicationWindow {
     Action {
         id: acAddNotGate
         text: qsTr("Add NOT/REPEATER gate")
-        onTriggered: newGate(GateLib.Not)
+        onTriggered: newGate(GateType.Not)
         shortcut: 'Ctrl+4'
         icon {
             source: 'qrc:/img/24x24/notGate.png'
@@ -178,8 +177,12 @@ ApplicationWindow {
                 id: notCheck
                 text: qsTr("Inverted")
                 enabled: mArea.current !== null && !mArea.dragging
-                checked: mArea.current !== null ? mArea.current.not : false
-                onToggled: if(mArea.current !== null) mArea.current.not = checked
+                checked: mArea.current !== null ? mArea.current.inv : false
+                onToggled: {
+                    if(mArea.current !== null)
+                        mArea.current.inv = checked
+                    checked = mArea.current.inv
+                }
                 ToolTip {
                     enabled: true
                     text: qsTr("Toggle output iversion")
@@ -190,11 +193,15 @@ ApplicationWindow {
             SpinBox {
                 id: inPins
 
-                enabled: mArea.current !== null && !mArea.dragging && mArea.current.type != GateLib.Not
+                enabled: mArea.current !== null && !mArea.dragging && mArea.current.type !== GateType.Not
                 value: mArea.current !== null ? mArea.current.inputs : 0
                 from: 1
                 to: 8
-                onValueModified: if(mArea.current !== null) mArea.current.inputs = value
+                onValueModified: {
+                    if(mArea.current !== null)
+                        mArea.current.inputs = value
+                    value = mArea.current.inputs
+                }
                 ToolTip {
                     enabled: true
                     text: qsTr("Number of inputs")
@@ -226,32 +233,43 @@ ApplicationWindow {
     }
 
     footer: Pane {
+        id: sP
+        property int fontSize: 10
+//        implicitHeight: ypos.height
+        padding: 2
+        anchors.margins: 4
+
         RowLayout {
             Layout.fillWidth: true
+//            implicitHeight: ypos.height
+
             Label {
                 id: status
                 text: qsTr("Status:")
-                font.pointSize: 12
+                font.pointSize: sP.fontSize
             }
             Label {
                 id: xpos
-                text: '[' + ii.scX
-                font.pointSize: 12
+                text: sP.padding
+                font.pointSize: sP.fontSize
             }
 
             Label {
                 id: sep
                 text: ';'
-                font.pointSize: 12
+                font.pointSize: sP.fontSize
             }
 
             Label {
                 id: ypos
-                text: ii.scY + ']'
-                font.pointSize: 12
+                text: filler.padding
+                font.pointSize: sP.fontSize
             }
             Pane {
+                id: filler
+                padding: 2
                 Layout.fillWidth: true
+//                implicitHeight: ypos.height
             }
         }
     }
@@ -265,13 +283,11 @@ ApplicationWindow {
         property int scX: 0 // scale center x
         property int scY: 0 // scale center y
 
-        anchors.fill: parent
+//        anchors.fill: parent
 
-//        width: scView.width * 4
-//        height: scView.height * 4
-//            x: -scView.width*2;
-//            y: -scView.height*2
-//            clip: true
+        width: Screen.width
+        height: Screen.height
+        clip: true
 
         transform: Scale {
             xScale: ii.scaleF
