@@ -7,10 +7,10 @@ var gID = 0;
 var gatesMap=[];
 
 function preload() {
-    gatesMap[Gates.GateType.Not] = "GNot.qml"
-    gatesMap[Gates.GateType.And] = "GAnd.qml"
-    gatesMap[Gates.GateType.Or] = "GOr.qml"
-    gatesMap[Gates.GateType.Xor] = "GXor.qml"
+    gatesMap[Gates.GateLib.Not] = "GNot.qml"
+    gatesMap[Gates.GateLib.And] = "GAnd.qml"
+    gatesMap[Gates.GateLib.Or] = "GOr.qml"
+    gatesMap[Gates.GateLib.Xor] = "GXor.qml"
 
     for( var i in gatesMap) {
         gatesMap[i] = Qt.createComponent(gatesMap[i]);

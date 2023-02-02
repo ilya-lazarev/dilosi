@@ -3,5 +3,5 @@ import gates.org 1.0
 
 Gate {
     symbol: '&'
-    type: GateType.And
+    type: GateLib.And
 }

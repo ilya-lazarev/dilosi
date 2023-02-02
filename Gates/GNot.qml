@@ -3,6 +3,6 @@ import gates.org 1.0
 
 Gate {
     symbol: '1'
-    type: GateType.Not
+    type: GateLib.Not
     inputs: 1
 }

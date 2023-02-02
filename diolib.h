@@ -14,14 +14,15 @@ public:
         Not, And, Or, Xor
     };
     Q_ENUM(GateType)
+
     explicit DIOlib(QObject *parent = nullptr);
-    explicit DIOlib(DIOlib &ref) : QObject(ref.parent()) {}
+    explicit DIOlib(const DIOlib &ref) : QObject(ref.parent()) {}
     virtual ~DIOlib() {}
     static void registerToQML();
-    void writeConfig(QList<QObject *> *);
+
+    Q_INVOKABLE void writeConfig(const QList<QObject *> &);
 signals:
 
 };
 
-//Q_DECLARE_METATYPE(DIOlib::GateType)
 #endif // DIOLIB_H

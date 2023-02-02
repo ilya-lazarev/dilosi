@@ -1,6 +1,7 @@
 QT += quick
 
 CONFIG += c++11
+#CONFIG += qmltypes
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -17,6 +18,9 @@ TRANSLATIONS += \
     dilosi_en_US.ts
 CONFIG += lrelease
 CONFIG += embed_translations
+
+#QML_IMPORT_NAME = gates.org
+#QML_IMPORT_MAJOR_VERSION = 1
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH += $$PWD/Gates $$PWD

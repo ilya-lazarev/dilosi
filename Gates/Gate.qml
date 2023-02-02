@@ -16,7 +16,7 @@ Item {
     readonly property int _ofs: 4
 
     implicitWidth: 50
-    implicitHeight: type == GateType.Not ? 50 : 60
+    implicitHeight: type == GateLib.Not ? 50 : 60
 
     // dimmer - alert,selcted
     Rectangle {
@@ -34,7 +34,7 @@ Item {
         readonly property int _pinStep: (baseRect.height - _ofs)
         color: '#00000000'
         implicitWidth: parent.width - rad*2
-        implicitHeight: type == GateType.Not ? parent.width - rad*2 : parent.height
+        implicitHeight: type == GateLib.Not ? parent.width - rad*2 : parent.height
         x: rad
         y: 0
         border {
@@ -88,10 +88,16 @@ Item {
     }
 
     Label {
+        id: label
         text: symbol
         x: 2*rad + stroke
         y: rad
         font.pixelSize: root.height / 4
+    }
+    Label {
+        y: label.y + label.height+2
+        x: label.x
+        text: '' + root.x +',\n' + root.y
     }
 
 }
