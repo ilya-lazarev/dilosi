@@ -41,7 +41,7 @@ ApplicationWindow {
         shortcut: 'Ctrl+S'
         onTriggered: {
             console.log("SaveFile")
-            iolib.writeConfig(ii.gates)
+            iolib.writeFile(ii.gates)
         }
         icon {
             source: 'qrc:/img/24x24/filesave.png'
@@ -405,8 +405,8 @@ ApplicationWindow {
                 if(dragObj) {
                     dragging = true
                     moved = true
-                    dragObj.x = mouse.x - op.x
-                    dragObj.y = mouse.y - op.y
+                    dragObj.x = Math.round(mouse.x - op.x)
+                    dragObj.y = Math.round(mouse.y - op.y)
                     dragObj.alert = ii.checkOverlap(dragObj)
                 } else if((mouse.buttons & Qt.MiddleButton) && panning) {
                     var p = ii.mapToGlobal(mouse.x, mouse.y)
@@ -434,5 +434,6 @@ ApplicationWindow {
 
     Component.onCompleted: {
         GL.preload();
+        ii.gates = iolib.loadFile();
     }
 }

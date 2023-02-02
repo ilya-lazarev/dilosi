@@ -94,6 +94,7 @@ Item {
         y: rad
         font.pixelSize: root.height / 4
     }
+
     Label {
         y: label.y + label.height+2
         x: label.x
