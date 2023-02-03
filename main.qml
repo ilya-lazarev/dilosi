@@ -180,12 +180,12 @@ ApplicationWindow {
             CheckBox {
                 id: notCheck
                 text: qsTr("Inverted")
-                enabled: ii.getSelected() != null && !mArea.dragging
-                checked: ii.getSelected() != null  ? ii.getSelected().inv : false
+                enabled: ii.current != null && !mArea.dragging
+                checked: ii.current != null  ? ii.current.inv : false
                 onToggled: {
-                    if(ii.getSelected() != null)
-                        ii.getSelected().inv = checked
-                    checked = ii.getSelected().inv
+                    if(ii.current != null)
+                        ii.current.inv = checked
+                    checked = ii.current.inv
                 }
                 ToolTip {
                     enabled: true
@@ -194,11 +194,12 @@ ApplicationWindow {
                     visible: parent.hovered
                 }
             }
+
             SpinBox {
                 id: inPins
 
-                enabled: ii.getSelected() != null && !mArea.dragging && ii.getSelected().type !== GateType.Not
-                value: ii.getSelected() != null ? ii.getSelected().inputs : 0
+                enabled: ii.current != null && !mArea.dragging && ii.current.type !== GateType.Not
+                value:  ii.current != null ? ii.current.inputs : 0
                 from: 1
                 to: 8
                 onValueModified: {
@@ -291,6 +292,7 @@ ApplicationWindow {
             property real scaleF: 1.0
             property int scX: 0 // scale center x
             property int scY: 0 // scale center y
+            property var current: null
 
     //        anchors.fill: parent
             anchors.centerIn: parent
@@ -357,15 +359,28 @@ ApplicationWindow {
 
             // return only 1st selection
 
-            function getSelected() { return selection.length == 1 ? selection[0] : null }
+            function getSelected() {
+                if( selection.length == 1 ) {
+                    console.log("Get sel=", selection[0].objectName)
+                    return selection[0]
+                }
+                return null
+            }
+
+            function updateCurrent() {
+                if( selection.length == 1 )
+                    current = selection[0]
+                else if( selection.length == 0 )
+                    current = null
+            }
 
             function addSelection(obj) {
                 if( selection.indexOf(obj) == -1) {
                     selection.push(obj)
                     obj.selected = true
                     console.log("Add sel", obj.objectName)
-                    selectionChanged(selection)
                 }
+                updateCurrent()
             }
 
             function delSelection(obj) {
@@ -375,7 +390,7 @@ ApplicationWindow {
                     obj.selected = false
                     selection.splice(i,1)
                     console.log("Del sel", obj.objectName)
-                    selectionChanged(selection)
+                    updateCurrent()
                 }
             }
 
@@ -383,7 +398,7 @@ ApplicationWindow {
                 selection.map( x => x.selected = false)
                 selection = []
                 console.log("Clr sel")
-                selectionChanged(selection)
+                updateCurrent()
             }
 
             MouseArea {
