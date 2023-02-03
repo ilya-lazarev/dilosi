@@ -16,6 +16,20 @@ ApplicationWindow {
     property int menuHeight: 16
     property int iconSize: 24
 
+    function makeRect(o) {
+        return ''+o.x+','+o.y+',' + (o.x+o.width) + 'x' + (o.y+o.height)
+    }
+
+    function rectContains(outer, inner) {
+        function between(p, p1, p2) {
+            return p1 <= p && p <= p2;
+        }
+        var right = outer.x + outer.width, bottom = outer.y + outer.height
+        return between(inner.x, outer.x, right) && between(inner.y, outer.y, bottom) &&
+                between(inner.x + inner.width, outer.x, right) &&
+                between(inner.y + inner.height, outer.y, bottom)
+    }
+
     function newGate(type, args) {
         var g;
         if(!args) {
@@ -327,6 +341,20 @@ ApplicationWindow {
                 enabled: false
             }
 
+            // selection rectangle
+            Rectangle {
+                id: selp
+                z: ii.z + 1
+                color: "#66506add"
+                visible: false
+                function moveAt(p1, p2) {
+                    selp.x = Math.min(p1.x, p2.x)
+                    selp.y = Math.min(p1.y, p2.y)
+                    selp.width = Math.abs(p1.x - p2.x)
+                    selp.height = Math.abs(p1.y - p2.y)
+                }
+            }
+
             function checkOverlap(o) {
                 var c;
 
@@ -368,17 +396,21 @@ ApplicationWindow {
             }
 
             function updateCurrent() {
-                if( selection.length == 1 )
+                if( selection.length == 1 ) {
                     current = selection[0]
-                else if( selection.length == 0 )
+                    console.log("Current is ", current.objectName)
+                }
+                else {
                     current = null
+                    console.log("No current ")
+                }
             }
 
             function addSelection(obj) {
                 if( selection.indexOf(obj) == -1) {
                     selection.push(obj)
                     obj.selected = true
-                    console.log("Add sel", obj.objectName)
+                    console.log("Add sel", obj.objectName, '#', selection.length)
                 }
                 updateCurrent()
             }
@@ -415,20 +447,37 @@ ApplicationWindow {
                 property bool panning: false
                 property point startP: Qt.point(0,0)
                 property point centerP: Qt.point(0,0)
+                property var moveArr: []
 
                 onPressed: {
                     if( mouse.button == Qt.LeftButton) {
                         moved = false
                         var obj = ii.childAt(mouse.x, mouse.y)
+
                         if(obj !== null && obj.objectName.startsWith("gate_")) {
                             dragging = false
                             dragObj = obj
-                            startP.x = obj.x
-                            startP.y  = obj.y
-                            op = ii.mapToItem(obj, mouse.x, mouse.y)
+                            var di = ii.selection.indexOf(obj);
+                            console.log("Index of obj = ", di)
+                            if( ii.numSelection() > 0 && di != -1) {
+                                dragObj = null
+                                ii.selection.map( x => moveArr.push(ii.mapToItem(x, mouse.x, mouse.y)) )
+                            }
+                            else
+                                op = ii.mapToItem(obj, mouse.x, mouse.y)
+
+                            console.log("Dragging " + (dragObj ? "one" : moveArr.length))
+//                            startP.x = obj.x
+//                            startP.y  = obj.y
                         } else {
                             // clear selection
                             ii.clearSelection()
+                            dragObj = null
+                            dragging = false
+                            startP.x = mouse.x
+                            startP.y = mouse.y
+                            selp.moveAt(startP, mouse)
+                            selp.visible = true
                         }
                     } else if(mouse.button == Qt.MiddleButton) {
                         startP = ii.mapToGlobal(mouse.x, mouse.y)
@@ -460,21 +509,31 @@ ApplicationWindow {
                             dragObj.y = startP.y
                             dragObj.alert = false
                         }
-
                         dragging = false
+                        moveArr = []
+                        ii.updateCurrent()
                     } else if(mouse.button == Qt.MiddleButton) {
                         panning = false
                     }
+                    selp.visible = false
 
                 }
 
                 onPositionChanged: {
-                    if(dragObj) {
+                    if(dragObj || moveArr.length) {
+                        var d;
                         dragging = true
                         moved = true
-                        dragObj.x = Math.round(mouse.x - op.x)
-                        dragObj.y = Math.round(mouse.y - op.y)
-                        dragObj.alert = ii.checkOverlap(dragObj)
+                        if(moveArr.length)
+                            moveArr.map( (x, i) => {
+                                        ii.selection[i].x = Math.round(mouse.x - x.x)
+                                        ii.selection[i].y = Math.round(mouse.y - x.y)
+                                        })
+                        else {
+                            dragObj.x = Math.round(mouse.x - op.x)
+                            dragObj.y = Math.round(mouse.y - op.y)
+                            dragObj.alert = ii.checkOverlap(dragObj)
+                        }
                     } else if((mouse.buttons & Qt.MiddleButton) && panning) {
                         var p = ii.mapToGlobal(mouse.x, mouse.y)
                         p.x -= startP.x
@@ -483,8 +542,12 @@ ApplicationWindow {
                         ii.scY = Math.min(Math.max(centerP.y - p.y * ii.scaleF, 0), ii.height)
                         xpos.text = ii.scX
                         ypos.text = ii.scY
+                    } else if(mouse.buttons & Qt.LeftButton && selp.visible) {
+                        // Update selection rectangle
+                        selp.moveAt(startP, mouse)
+                        ii.clearSelection()
+                        ii.gates.map( x => rectContains(selp, x) ? ii.addSelection(x) : null)
                     }
-
                 }
 
                 onWheel: {
@@ -501,6 +564,7 @@ ApplicationWindow {
             }
         }
     }
+
     Component.onCompleted: {
         GL.preload();
     }
