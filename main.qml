@@ -18,8 +18,12 @@ ApplicationWindow {
 
     function newGate(type, args) {
         var g;
-        if(!args)
-            args = {type: type, x: ii.width/2, y: ii.height/2}
+        if(!args) {
+            console.log("Default args")
+            var p = cona.mapToItem(ii, cona.width/2, cona.height/2)
+            console.log("map ", cona.width/2, cona.height/2, "=>", p)
+            args = {type: type, x: p.x, y: p.y}
+        }
 
         g = GL.createGate(ii, args)
 
@@ -276,188 +280,194 @@ ApplicationWindow {
 
 
     Item {
-        id: ii
-        z: -1
-        property var gates: []
-        property real scaleF: 1.0
-        property int scX: 0 // scale center x
-        property int scY: 0 // scale center y
+        id: cona
+        anchors.fill: parent
 
-//        anchors.fill: parent
-
-        width: Screen.width
-        height: Screen.height
-        clip: true
-
-        transform: Scale {
-            xScale: ii.scaleF
-            yScale: ii.scaleF
-            origin {
-                x: ii.scX
-                y: ii.scY
-            }
-        }
-
-        Rectangle {
-            x: 0; y: 0
-            anchors.fill: parent
-            color: '#77007700'
+        Item {
+            id: ii
             z: -1
-            border.color: '#88000000'
-            enabled: false
-        }
+            property var gates: []
+            property real scaleF: 1.0
+            property int scX: 0 // scale center x
+            property int scY: 0 // scale center y
 
-        function findFromPoint(gp) {
-            for(var i in ii.gates) {
-                var c = ii.gates[i]
-                var lp = c.mapFromGlobal(gp.x, gp.y)
-                if( c.contains(lp) && c.objectName && c.objectName.startsWith("gate_")) {
-                    return c
+    //        anchors.fill: parent
+            anchors.centerIn: parent
+
+            width: Screen.width
+            height: Screen.height
+            clip: true
+
+            transform: Scale {
+                xScale: ii.scaleF
+                yScale: ii.scaleF
+                origin {
+                    x: ii.scX
+                    y: ii.scY
                 }
             }
 
-            return null
-        }
-
-        function contains(item, x, y) {
-            var p = {x: x, y: y}
-            return item.contains(p);
-        }
-
-        function checkOverlap(o) {
-            var c;
-
-            for( var i in gates ) {
-                if(o === ii.gates[i])
-                    continue;
-                c = ii.gates[i];
-
-                if(c.contains(Qt.point(o.x - c.x, o.y - c.y)))
-                    return true;
-                if(c.contains(Qt.point(o.x + o.width - c.x, o.y - c.y)))
-                    return true;
-                if(c.contains(Qt.point(o.x + o.width - c.x, o.y + o.height - c.y)))
-                    return true;
-                if(c.contains(Qt.point(o.x - c.x, o.y + o.height- c.y)))
-                    return true;
-
-                // not overlapped
+            Rectangle {
+                x: 0; y: 0
+                anchors.fill: parent
+                color: '#77007700'
+                z: -1
+                border {
+                    color: '#88000000'
+                    width: 4
+                }
+                enabled: false
             }
-            return false;
-        }
 
-        function updateLimits() {
-            ii.scX = Math.min(Math.max(ii.scX, 0), ii.width)
-            ii.scY = Math.min(Math.max(ii.scY, 0), ii.height)
-        }
-
-        onWidthChanged: updateLimits()
-        onHeightChanged: updateLimits()
-
-        MouseArea {
-            id: mArea
-            x: 0; y: 0
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-            hoverEnabled: true
-            property bool dragging: false
-            property var current: null
-            property var dragObj: null
-            property point op: Qt.point(0,0)
-            property bool moved: false
-            property bool panning: false
-            property point startP: Qt.point(0,0)
-            property point centerP: Qt.point(0,0)
-
-            onPressed: {
-                if( mouse.button == Qt.LeftButton) {
-                    moved = false
-                    var g = ii.mapToGlobal(mouse.x, mouse.y)
-                    var obj = ii.findFromPoint(g)
-                    if(obj !== null) {
-                        dragging = false
-                        dragObj = obj
-                        startP.x = obj.x
-                        startP.y  = obj.y
-                        op = obj.mapFromGlobal(g.x, g.y)
-                    } else {
-                        if(current) {
-                            current.selected = false
-                            current = null
-                        }
+            function findFromPoint(gp) {
+                for(var i in ii.gates) {
+                    var c = ii.gates[i]
+                    var lp = c.mapFromGlobal(gp.x, gp.y)
+                    if( c.contains(lp) && c.objectName && c.objectName.startsWith("gate_")) {
+                        return c
                     }
-                } else if(mouse.button == Qt.MiddleButton) {
-                    startP = ii.mapToGlobal(mouse.x, mouse.y)
-                    centerP.x = ii.scX
-                    centerP.y = ii.scY
-                    panning = true
                 }
+
+                return null
             }
 
-            onClicked: {
-                if( mouse.button == Qt.LeftButton) {
-                    if( dragObj && !moved ) {
-                        if( !dragObj.selected) {
-                            ii.gates.map(o => o.selected =false)
-                            dragObj.selected = true
-                            current = dragObj
+            function checkOverlap(o) {
+                var c;
+
+                for( var i in gates ) {
+                    if(o === ii.gates[i])
+                        continue;
+                    c = ii.gates[i];
+
+                    if(c.contains(Qt.point(o.x - c.x, o.y - c.y)))
+                        return true;
+                    if(c.contains(Qt.point(o.x + o.width - c.x, o.y - c.y)))
+                        return true;
+                    if(c.contains(Qt.point(o.x + o.width - c.x, o.y + o.height - c.y)))
+                        return true;
+                    if(c.contains(Qt.point(o.x - c.x, o.y + o.height- c.y)))
+                        return true;
+
+                    // not overlapped
+                }
+                return false;
+            }
+
+            // Update transformOrigin (scale center) point for ii
+            function updateLimits() {
+                ii.scX = Math.min(Math.max(ii.scX, 0), ii.width)
+                ii.scY = Math.min(Math.max(ii.scY, 0), ii.height)
+            }
+
+            onWidthChanged: updateLimits()
+            onHeightChanged: updateLimits()
+
+            MouseArea {
+                id: mArea
+                x: 0; y: 0
+                anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                hoverEnabled: true
+                property bool dragging: false
+                property var current: null
+                property var dragObj: null
+                property point op: Qt.point(0,0)
+                property bool moved: false
+                property bool panning: false
+                property point startP: Qt.point(0,0)
+                property point centerP: Qt.point(0,0)
+
+                onPressed: {
+                    if( mouse.button == Qt.LeftButton) {
+                        moved = false
+                        var g = ii.mapToGlobal(mouse.x, mouse.y)
+                        var obj = ii.findFromPoint(g)
+                        if(obj !== null) {
+                            dragging = false
+                            dragObj = obj
+                            startP.x = obj.x
+                            startP.y  = obj.y
+                            op = obj.mapFromGlobal(g.x, g.y)
                         } else {
-                            dragObj.selected = false
-                            current = null
+                            if(current) {
+                                current.selected = false
+                                current = null
+                            }
                         }
+                    } else if(mouse.button == Qt.MiddleButton) {
+                        startP = ii.mapToGlobal(mouse.x, mouse.y)
+                        centerP.x = ii.scX
+                        centerP.y = ii.scY
+                        panning = true
                     }
-                    moved = false
-                    dragObj = null
                 }
-            }
+
+                onClicked: {
+                    if( mouse.button == Qt.LeftButton) {
+                        if( dragObj && !moved ) {
+                            if( !dragObj.selected) {
+                                ii.gates.map(o => o.selected =false)
+                                dragObj.selected = true
+                                current = dragObj
+                            } else {
+                                dragObj.selected = false
+                                current = null
+                            }
+                        }
+                        moved = false
+                        dragObj = null
+                    }
+                }
 
 
-            onReleased: {
-                if( mouse.button == Qt.LeftButton) {
-                    if(dragObj && ii.checkOverlap(dragObj)) {
-                        dragObj.x = startP.x
-                        dragObj.y = startP.y
-                        dragObj.alert = false
+                onReleased: {
+                    if( mouse.button == Qt.LeftButton) {
+                        if(dragObj && ii.checkOverlap(dragObj)) {
+                            dragObj.x = startP.x
+                            dragObj.y = startP.y
+                            dragObj.alert = false
+                        }
+
+                        dragging = false
+                    } else if(mouse.button == Qt.MiddleButton) {
+                        panning = false
                     }
 
-                    dragging = false
-                } else if(mouse.button == Qt.MiddleButton) {
-                    panning = false
                 }
 
-            }
+                onPositionChanged: {
+                    if(dragObj) {
+                        dragging = true
+                        moved = true
+                        dragObj.x = Math.round(mouse.x - op.x)
+                        dragObj.y = Math.round(mouse.y - op.y)
+                        dragObj.alert = ii.checkOverlap(dragObj)
+                    } else if((mouse.buttons & Qt.MiddleButton) && panning) {
+                        var p = ii.mapToGlobal(mouse.x, mouse.y)
+                        p.x -= startP.x
+                        p.y -= startP.y
+                        ii.scX = Math.min(Math.max(centerP.x - p.x * ii.scaleF, 0), ii.width)
+                        ii.scY = Math.min(Math.max(centerP.y - p.y * ii.scaleF, 0), ii.height)
+                        xpos.text = ii.scX
+                        ypos.text = ii.scY
+                    }
 
-            onPositionChanged: {
-                if(dragObj) {
-                    dragging = true
-                    moved = true
-                    dragObj.x = Math.round(mouse.x - op.x)
-                    dragObj.y = Math.round(mouse.y - op.y)
-                    dragObj.alert = ii.checkOverlap(dragObj)
-                } else if((mouse.buttons & Qt.MiddleButton) && panning) {
-                    var p = ii.mapToGlobal(mouse.x, mouse.y)
-                    p.x -= startP.x
-                    p.y -= startP.y
-                    ii.scX = Math.min(Math.max(centerP.x - p.x * ii.scaleF, 0), ii.width)
-                    ii.scY = Math.min(Math.max(centerP.y - p.y * ii.scaleF, 0), ii.height)
                 }
 
-            }
-
-            onWheel: {
-                if(wheel.angleDelta.y > 0 && ii.scaleF <= zoomView.to / 100.0) {
-                    ii.scX = wheel.x
-                    ii.scY = wheel.y
-                    ii.scaleF += .05
-                } else if(ii.scaleF>1){
-                    ii.scX = wheel.x
-                    ii.scY = wheel.y
-                    ii.scaleF -= .05
+                onWheel: {
+                    if(wheel.angleDelta.y > 0 && ii.scaleF <= zoomView.to / 100.0) {
+                        ii.scX = wheel.x
+                        ii.scY = wheel.y
+                        ii.scaleF += .05
+                    } else if(ii.scaleF > zoomView.from / 100.0){
+                        ii.scX = wheel.x
+                        ii.scY = wheel.y
+                        ii.scaleF -= .05
+                    }
                 }
             }
         }
     }
-
     Component.onCompleted: {
         GL.preload();
     }
