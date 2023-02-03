@@ -180,12 +180,12 @@ ApplicationWindow {
             CheckBox {
                 id: notCheck
                 text: qsTr("Inverted")
-                enabled: mArea.current !== null && !mArea.dragging
-                checked: mArea.current !== null ? mArea.current.inv : false
+                enabled: ii.getSelected() != null && !mArea.dragging
+                checked: ii.getSelected() != null  ? ii.getSelected().inv : false
                 onToggled: {
-                    if(mArea.current !== null)
-                        mArea.current.inv = checked
-                    checked = mArea.current.inv
+                    if(ii.getSelected() != null)
+                        ii.getSelected().inv = checked
+                    checked = ii.getSelected().inv
                 }
                 ToolTip {
                     enabled: true
@@ -197,14 +197,14 @@ ApplicationWindow {
             SpinBox {
                 id: inPins
 
-                enabled: mArea.current !== null && !mArea.dragging && mArea.current.type !== GateType.Not
-                value: mArea.current !== null ? mArea.current.inputs : 0
+                enabled: ii.getSelected() != null && !mArea.dragging && ii.getSelected().type !== GateType.Not
+                value: ii.getSelected() != null ? ii.getSelected().inputs : 0
                 from: 1
                 to: 8
                 onValueModified: {
-                    if(mArea.current !== null)
-                        mArea.current.inputs = value
-                    value = mArea.current.inputs
+                    if(ii.getSelected() !== null)
+                        ii.getSelected().inputs = value
+                    value = ii.getSelected().inputs
                 }
                 ToolTip {
                     enabled: true
@@ -287,6 +287,7 @@ ApplicationWindow {
             id: ii
             z: -1
             property var gates: []
+            property var selection: []
             property real scaleF: 1.0
             property int scX: 0 // scale center x
             property int scY: 0 // scale center y
@@ -306,6 +307,11 @@ ApplicationWindow {
                     y: ii.scY
                 }
             }
+
+//            signal selectionChanged();
+
+            onWidthChanged: updateLimits()
+            onHeightChanged: updateLimits()
 
             Rectangle {
                 x: 0; y: 0
@@ -347,17 +353,47 @@ ApplicationWindow {
                 ii.scY = Math.min(Math.max(ii.scY, 0), ii.height)
             }
 
-            onWidthChanged: updateLimits()
-            onHeightChanged: updateLimits()
+            function numSelection() { return selection.length }
+
+            // return only 1st selection
+
+            function getSelected() { return selection.length == 1 ? selection[0] : null }
+
+            function addSelection(obj) {
+                if( selection.indexOf(obj) == -1) {
+                    selection.push(obj)
+                    obj.selected = true
+                    console.log("Add sel", obj.objectName)
+                    selectionChanged(selection)
+                }
+            }
+
+            function delSelection(obj) {
+                var i = selection.indexOf(obj)
+
+                if( i != -1 ) {
+                    obj.selected = false
+                    selection.splice(i,1)
+                    console.log("Del sel", obj.objectName)
+                    selectionChanged(selection)
+                }
+            }
+
+            function clearSelection() {
+                selection.map( x => x.selected = false)
+                selection = []
+                console.log("Clr sel")
+                selectionChanged(selection)
+            }
 
             MouseArea {
                 id: mArea
-                x: 0; y: 0
-                anchors.fill: parent
                 acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                anchors.fill: parent
                 hoverEnabled: true
+
                 property bool dragging: false
-                property var current: null
+//                property var current: null
                 property var dragObj: null
                 property point op: Qt.point(0,0)
                 property bool moved: false
@@ -376,10 +412,8 @@ ApplicationWindow {
                             startP.y  = obj.y
                             op = ii.mapToItem(obj, mouse.x, mouse.y)
                         } else {
-                            if(current) {
-                                current.selected = false
-                                current = null
-                            }
+                            // clear selection
+                            ii.clearSelection()
                         }
                     } else if(mouse.button == Qt.MiddleButton) {
                         startP = ii.mapToGlobal(mouse.x, mouse.y)
@@ -392,20 +426,17 @@ ApplicationWindow {
                 onClicked: {
                     if( mouse.button == Qt.LeftButton) {
                         if( dragObj && !moved ) {
-                            if( !dragObj.selected) {
-                                ii.gates.map(o => o.selected =false)
-                                dragObj.selected = true
-                                current = dragObj
+                            if( ! dragObj.selected ) {
+                                ii.clearSelection()
+                                ii.addSelection(dragObj)
                             } else {
-                                dragObj.selected = false
-                                current = null
+                                ii.delSelection(dragObj)
                             }
                         }
                         moved = false
                         dragObj = null
                     }
                 }
-
 
                 onReleased: {
                     if( mouse.button == Qt.LeftButton) {
