@@ -8,6 +8,9 @@ Item {
     id: root
 
     GateType { id: gt }
+    implicitWidth: 50
+    implicitHeight: gate.type == GateType.Not ? 50 : 60
+
     property alias gate: gt
     property alias inv: gt.inv
     property alias inputs: gt.inputs
@@ -16,9 +19,8 @@ Item {
     property bool alert: false
     property bool selected: false
     readonly property int _ofs: 4
+    readonly property int pinMinSpacing: implicitWidth / 3
 
-    implicitWidth: 50
-    implicitHeight: gate.type == GateType.Not ? 50 : 60
     x: gt.x
     y: gt.y
 
@@ -38,7 +40,6 @@ Item {
 
     Rectangle {
         id: baseRect
-        readonly property int _pinStep: (baseRect.height - _ofs)
         color: '#00000000'
         implicitWidth: parent.width - rad*2
         implicitHeight: gate.type == GateType.Not ? parent.width - rad*2 : parent.height

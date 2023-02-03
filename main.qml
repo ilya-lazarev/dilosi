@@ -319,18 +319,6 @@ ApplicationWindow {
                 enabled: false
             }
 
-            function findFromPoint(gp) {
-                for(var i in ii.gates) {
-                    var c = ii.gates[i]
-                    var lp = c.mapFromGlobal(gp.x, gp.y)
-                    if( c.contains(lp) && c.objectName && c.objectName.startsWith("gate_")) {
-                        return c
-                    }
-                }
-
-                return null
-            }
-
             function checkOverlap(o) {
                 var c;
 
@@ -380,14 +368,13 @@ ApplicationWindow {
                 onPressed: {
                     if( mouse.button == Qt.LeftButton) {
                         moved = false
-                        var g = ii.mapToGlobal(mouse.x, mouse.y)
-                        var obj = ii.findFromPoint(g)
-                        if(obj !== null) {
+                        var obj = ii.childAt(mouse.x, mouse.y)
+                        if(obj !== null && obj.objectName.startsWith("gate_")) {
                             dragging = false
                             dragObj = obj
                             startP.x = obj.x
                             startP.y  = obj.y
-                            op = obj.mapFromGlobal(g.x, g.y)
+                            op = ii.mapToItem(obj, mouse.x, mouse.y)
                         } else {
                             if(current) {
                                 current.selected = false
