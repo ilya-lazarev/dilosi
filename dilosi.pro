@@ -1,6 +1,6 @@
 QT += quick
 
-CONFIG += c++11
+CONFIG += c++11 console
 #CONFIG += qmltypes
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -15,13 +15,12 @@ SOURCES += \
 RESOURCES += qml.qrc Gates/Gates.qrc
 
 
-TRANSLATIONS += \
-    dilosi_en_US.ts
+TRANSLATIONS += dilosi_en_US.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 
-#QML_IMPORT_NAME = gates.org
-#QML_IMPORT_MAJOR_VERSION = 1
+QML_IMPORT_NAME = gates.org
+QML_IMPORT_MAJOR_VERSION = 1
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH += $$PWD/Gates $$PWD

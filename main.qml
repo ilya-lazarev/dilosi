@@ -219,6 +219,7 @@ ApplicationWindow {
                         ii.getSelected().inputs = value
 //                    value = ii.getSelected().inputs
                 }
+
                 ToolTip {
                     enabled: true
                     text: qsTr("Number of inputs")

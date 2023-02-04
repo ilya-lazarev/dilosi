@@ -4,6 +4,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QQmlContext>
+#include <QImage>
 #include "diolib.h"
 
 int main(int argc, char *argv[])
@@ -25,14 +26,21 @@ int main(int argc, char *argv[])
             break;
         }
     }
+    QTextStream(stdout) << "Start\n";
 
     QQmlApplicationEngine engine;
-    engine.addImportPath("./");
+    engine.addImportPath("qrc:");
+
+    // test resource path
+    QImage img(":/img/24x24/andGate.png");
+    qDebug() << img.width();
+
     iolib.setEngine(engine);
 
     engine.rootContext()->setContextProperty("iolib", &iolib);
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
+
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)

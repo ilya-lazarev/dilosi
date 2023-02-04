@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/Gates">
         <file>qmldir</file>
         <file>GAnd.qml</file>
         <file>Gate.qml</file>
