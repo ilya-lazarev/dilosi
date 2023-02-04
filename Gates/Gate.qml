@@ -9,9 +9,11 @@ Item {
 
     GateType { id: gt }
     implicitWidth: 50
+    property alias gate: gt
+
     implicitHeight: gate.type == GateType.Not ? 50 : 60
 
-    property alias gate: gt
+    property alias type: gt.type
     property alias inv: gt.inv
     property alias inputs: gt.inputs
     property int rad: 6

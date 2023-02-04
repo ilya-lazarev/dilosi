@@ -44,7 +44,11 @@ void DGate::setNot(bool nn)
 
 void DGate::setInputs(int ni)
 {
-    if(type != GateType::Not && ni < 2)
+    if( type == GateType::Not )
+    {
+        ni = 1;
+    }
+    if( type != GateType::Not && ni < 2 )
         ni = 2;
 
     if( ni != inputs )
