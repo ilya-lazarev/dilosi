@@ -29,16 +29,23 @@ ApplicationWindow {
 
         g = GL.createGate(ii, args)
 
-        if(g !== null)
+        if(g !== null) {
             ii.gates.push(g)
+            ii.gatesChanged()
+        }
         return g;
     }
+
 
     function deleteGates(list) {
         list.map( (x) =>  {
                      var s = ii.gates.indexOf(x)
                       if( s > -1 ) {
-                         gates.splice( s, 1 )
+                         var obj = ii.gates[s];
+                         console.log("Deleting gate ", obj.objectName)
+                        obj.destroy()
+                         ii.gates.splice( s, 1 )
+                         ii.gatesChanged()
                      }
                  })
     }
@@ -383,11 +390,8 @@ ApplicationWindow {
 
             Label {
                 id: nGates
-                text:  {
-                    console.log("# Gates: ", ii.gates.length, ii.selection.length)
-                    ii.gates.length + '/' + ii.selection.length
-                }
                 font.pointSize: sP.fontSize
+                text: '' + ii.gates.length + '/' + ii.selection.length
             }
 
             Pane {
@@ -431,10 +435,67 @@ ApplicationWindow {
                 }
             }
 
-//            signal selectionChanged();
-
             onWidthChanged: updateLimits()
             onHeightChanged: updateLimits()
+
+            // Update transformOrigin (scale center) point for ii
+            function updateLimits() {
+                ii.scX = Math.min(Math.max(ii.scX, 0), ii.width)
+                ii.scY = Math.min(Math.max(ii.scY, 0), ii.height)
+            }
+
+            function numSelection() { return selection.length }
+
+            // return only 1st selection
+
+            function selectAll() {
+                clearSelection()
+                selection = gates.slice()
+                gates.map( x => x.selected = true)
+                selectionChanged()
+            }
+
+            function getSelected() {
+                if( selection.length == 1 ) {
+                    return selection[0]
+                }
+                return null
+            }
+
+            function updateCurrent() {
+                if( selection.length == 1 )
+                    ii.current = selection[0]
+                else
+                    ii.current = null
+            }
+
+            function addSelection(obj) {
+                if( selection.indexOf(obj) == -1) {
+                    selection.push(obj)
+                    obj.selected = true
+                }
+                updateCurrent()
+                selectionChanged()
+            }
+
+            // remove from selected gates
+            function delSelection(obj) {
+                var i = selection.indexOf(obj)
+
+                if( i != -1 ) {
+                    obj.selected = false
+                    selection.splice(i,1)
+                    updateCurrent()
+                }
+                selectionChanged()
+            }
+
+            function clearSelection() {
+                selection.map( x => x.selected = false)
+                selection = []
+                updateCurrent()
+                selectionChanged()
+            }
 
             // canvas
             Rectangle {
@@ -491,7 +552,8 @@ ApplicationWindow {
                         if(obj !== null && obj.objectName.startsWith("gate_")) {
                             dragObj = obj
                             var di = ii.selection.indexOf(obj);
-                            if( ii.numSelection() > 0 && di != -1) {
+
+                            if( ii.numSelection() > 0 && di != -1) { // obj is among already selected
                                 dragObj = null
                                 ii.selection.map( (x) => {
                                         moveArr.push(ii.mapToItem(x, mouse.x, mouse.y))
@@ -529,8 +591,10 @@ ApplicationWindow {
                         if( dragObj && !moved ) {
                             if( ! dragObj.selected ) {
                                 ii.clearSelection()
+
                                 ii.addSelection(dragObj)
                             } else {
+                                console.log("On selected")
                                 ii.delSelection(dragObj)
                             }
                         }
@@ -631,62 +695,8 @@ ApplicationWindow {
                 return false;
             }
 
-            // Update transformOrigin (scale center) point for ii
-            function updateLimits() {
-                ii.scX = Math.min(Math.max(ii.scX, 0), ii.width)
-                ii.scY = Math.min(Math.max(ii.scY, 0), ii.height)
-            }
-
-            function numSelection() { return selection.length }
-
-            // return only 1st selection
-
-            function selectAll() {
-                clearSelection()
-                selection = gates.slice()
-                gates.map( x => x.selected = true)
-            }
-
-            function getSelected() {
-                if( selection.length == 1 ) {
-                    return selection[0]
-                }
-                return null
-            }
-
-            function updateCurrent() {
-                if( selection.length == 1 )
-                    ii.current = selection[0]
-                else
-                    ii.current = null
-            }
-
-            function addSelection(obj) {
-                if( selection.indexOf(obj) == -1) {
-                    selection.push(obj)
-                    obj.selected = true
-                }
-                updateCurrent()
-            }
-
-            // remove from selected gates
-            function delSelection(obj) {
-                var i = selection.indexOf(obj)
-
-                if( i != -1 ) {
-                    obj.selected = false
-                    selection.splice(i,1)
-                    updateCurrent()
-                }
-            }
-
-            function clearSelection() {
-                selection.map( x => x.selected = false)
-                selection = []
-                updateCurrent()
-            }
-        }
-    }
+        } // ii
+    } // cona
 
     Component.onCompleted: {
         GL.preload();
