@@ -20,16 +20,6 @@ ApplicationWindow {
         return ''+o.x+','+o.y+',' + (o.x+o.width) + 'x' + (o.y+o.height)
     }
 
-    function rectContains(outer, inner) {
-        function between(p, p1, p2) {
-            return p1 <= p && p <= p2;
-        }
-        var right = outer.x + outer.width, bottom = outer.y + outer.height
-        return between(inner.x, outer.x, right) && between(inner.y, outer.y, bottom) &&
-                between(inner.x + inner.width, outer.x, right) &&
-                between(inner.y + inner.height, outer.y, bottom)
-    }
-
     function newGate(type, args) {
         var g;
         if(!args) {
@@ -46,8 +36,8 @@ ApplicationWindow {
 
     function deleteGates(list) {
         list.map( (x) =>  {
-                     var s = gates.indexOf(x)
-                      if( s != -1 ) {
+                     var s = ii.gates.indexOf(x)
+                      if( s > -1 ) {
                          gates.splice( s, 1 )
                      }
                  })
@@ -98,13 +88,24 @@ ApplicationWindow {
     }
 
     Action {
+        id: acSelectAll
+
+        text: qsTr("Select all")
+        shortcut: 'Ctrl+A'
+        onTriggered: ii.selectAll()
+        icon {
+            source: 'qrc:/img/24x24/edit-select-all'
+        }
+    }
+
+    Action {
         id: acAddAndGate
 
         text: qsTr("Add (N)AND gate")
         onTriggered: newGate(GateType.And)
         shortcut: 'Ctrl+1'
         icon {
-            source: 'qrc:/img/24x24/andGate.png'
+            source: 'qrc:/img/48x48/andGate.png'
             color: 'transparent'
         }
     }
@@ -115,7 +116,7 @@ ApplicationWindow {
         onTriggered: newGate(GateType.Or)
         shortcut: 'Ctrl+2'
         icon {
-            source: 'qrc:/img/24x24/orGate.png'
+            source: 'qrc:/img/48x48/orGate.png'
             color: 'transparent'
         }
     }
@@ -126,7 +127,7 @@ ApplicationWindow {
         onTriggered: newGate(GateType.Xor)
         shortcut: 'Ctrl+3'
         icon {
-            source: 'qrc:/img/24x24/xorGate.png'
+            source: 'qrc:/img/48x48/xorGate.png'
             color: 'transparent'
         }
     }
@@ -138,7 +139,7 @@ ApplicationWindow {
         onTriggered: newGate(GateType.Not)
         shortcut: 'Ctrl+4'
         icon {
-            source: 'qrc:/img/24x24/notGate.png'
+            source: 'qrc:/img/48x48/notGate.png'
             color: 'transparent'
         }
     }
@@ -154,7 +155,7 @@ ApplicationWindow {
         }
         shortcut: 'Del'
         icon {
-            source: 'qrc:/img/24x24/deleteGate.png'
+            source: 'qrc:/img/48x48/deleteGate.png'
             color: 'transparent'
         }
     }
@@ -183,6 +184,16 @@ ApplicationWindow {
                 action: acAppExit
                 icon.color: "transparent"
                 font.pointSize: menuBar.fontSize
+            }
+        }
+
+        Menu {
+            title: qsTr("&Edit")
+
+            MenuItem {
+                action: acSelectAll
+                font.pointSize: menuBar.fontSize
+                icon.color: "transparent"
             }
         }
 
@@ -262,7 +273,9 @@ ApplicationWindow {
 
             TButton {
                 action: acDelGate
+                enabled: acDelGate.enabled
                 tooltip:  qsTr("Delete selected gate")
+//                enabled: ii.selection.length > 0
             }
 
             ToolSeparator { }
@@ -358,9 +371,25 @@ ApplicationWindow {
 
             Label {
                 id: ypos
-                text: filler.padding
+                text: ')'
                 font.pointSize: sP.fontSize
             }
+            Image {
+                id: stImage
+                source: 'qrc:/img/48x48/chip.png'
+                sourceSize.width: 20
+                mipmap: true
+            }
+
+            Label {
+                id: nGates
+                text:  {
+                    console.log("# Gates: ", ii.gates.length, ii.selection.length)
+                    ii.gates.length + '/' + ii.selection.length
+                }
+                font.pointSize: sP.fontSize
+            }
+
             Pane {
                 id: filler
                 padding: 2
@@ -407,10 +436,11 @@ ApplicationWindow {
             onWidthChanged: updateLimits()
             onHeightChanged: updateLimits()
 
+            // canvas
             Rectangle {
                 x: 0; y: 0
                 anchors.fill: parent
-                color: '#77007700'
+                color: '#77117733'
                 z: -1
                 border {
                     color: '#88000000'
@@ -559,7 +589,11 @@ ApplicationWindow {
                         // Update selection rectangle
                         selp.moveAt(startP, mouse)
                         ii.clearSelection()
-                        ii.gates.map( x => rectContains(selp, x) ? ii.addSelection(x) : null)
+
+                        var checkFunction = GL.rectIntersects
+                        if( mouse.modifiers & Qt.ShiftModifier )
+                            checkFunction = GL.rectContains
+                        ii.gates.map( x => checkFunction(selp, x) ? ii.addSelection(x) : null)
                     }
                 }
 
@@ -606,6 +640,12 @@ ApplicationWindow {
             function numSelection() { return selection.length }
 
             // return only 1st selection
+
+            function selectAll() {
+                clearSelection()
+                selection = gates.slice()
+                gates.map( x => x.selected = true)
+            }
 
             function getSelected() {
                 if( selection.length == 1 ) {
