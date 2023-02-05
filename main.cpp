@@ -4,6 +4,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QQmlContext>
+#include <QLoggingCategory>
 #include <QImage>
 #include "diolib.h"
 
@@ -28,11 +29,12 @@ int main(int argc, char *argv[])
     }
     QTextStream(stdout) << "Start\n";
 
+    QLoggingCategory::setFilterRules(QStringLiteral("qt.qml.binding.removal.info=true"));
     QQmlApplicationEngine engine;
     engine.addImportPath("qrc:");
 
     // test resource path
-    QImage img(":/img/24x24/andGate.png");
+    QImage img(":/img/48x48/andGate.png");
     qDebug() << img.width();
 
     iolib.setEngine(engine);
