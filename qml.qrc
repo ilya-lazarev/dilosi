@@ -15,5 +15,6 @@
         <file>img/24x24/orGate.png</file>
         <file>img/24x24/xorGate.png</file>
         <file>img/24x24/notGate.png</file>
+        <file>img/24x24/deleteGate.png</file>
     </qresource>
 </RCC>

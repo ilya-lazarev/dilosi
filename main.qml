@@ -44,6 +44,15 @@ ApplicationWindow {
         return g;
     }
 
+    function deleteGates(list) {
+        list.map( (x) =>  {
+                     var s = gates.indexOf(x)
+                      if( s != -1 ) {
+                         gates.splice( s, 1 )
+                     }
+                 })
+    }
+
     function loadFile() {
         console.log("OpenFile")
         var gg = iolib.loadFile();
@@ -54,6 +63,7 @@ ApplicationWindow {
 
     Action {
         id: acFileOpen
+
         text: qsTr("&Open")
         shortcut: 'Ctrl+O'
         onTriggered: loadFile()
@@ -64,6 +74,7 @@ ApplicationWindow {
 
     Action {
         id: acFileSave
+
         text: qsTr("&Save")
         shortcut: 'Ctrl+S'
         onTriggered: {
@@ -77,6 +88,7 @@ ApplicationWindow {
 
     Action {
         id: acAppExit
+
         text: qsTr("&Quit")
         shortcut: 'Ctrl+Q'
         onTriggered: Qt.quit()
@@ -87,6 +99,7 @@ ApplicationWindow {
 
     Action {
         id: acAddAndGate
+
         text: qsTr("Add (N)AND gate")
         onTriggered: newGate(GateType.And)
         shortcut: 'Ctrl+1'
@@ -97,6 +110,7 @@ ApplicationWindow {
     }
     Action {
         id: acAddOrGate
+
         text: qsTr("Add (N)OR gate")
         onTriggered: newGate(GateType.Or)
         shortcut: 'Ctrl+2'
@@ -107,6 +121,7 @@ ApplicationWindow {
     }
     Action {
         id: acAddXorGate
+
         text: qsTr("Add (N)XOR gate")
         onTriggered: newGate(GateType.Xor)
         shortcut: 'Ctrl+3'
@@ -118,6 +133,7 @@ ApplicationWindow {
 
     Action {
         id: acAddNotGate
+
         text: qsTr("Add NOT/REPEATER gate")
         onTriggered: newGate(GateType.Not)
         shortcut: 'Ctrl+4'
@@ -127,24 +143,77 @@ ApplicationWindow {
         }
     }
 
+    Action {
+        id: acDelGate
+
+        enabled: ii.selection.length > 0
+        text: qsTr("Delete selected gate")
+        onTriggered: {
+            deleteGates(ii.selection)
+            ii.clearSelection()
+        }
+        shortcut: 'Del'
+        icon {
+            source: 'qrc:/img/24x24/deleteGate.png'
+            color: 'transparent'
+        }
+    }
+
     menuBar: MenuBar {
         id: menuBar
         Layout.margins: 0
+        property int fontSize: 10
+
         Menu {
             title: qsTr("&File")
             MenuItem {
                 action: acFileOpen
-                font.pointSize: 10
+                font.pointSize: menuBar.fontSize
                 icon.color: "transparent"
             }
             MenuItem {
                 action: acFileSave
-                font.pointSize: 10
+                font.pointSize: menuBar.fontSize
                 icon.color: "transparent"
             }
+
             MenuSeparator {}
+
             MenuItem {
                 action: acAppExit
+                icon.color: "transparent"
+                font.pointSize: menuBar.fontSize
+            }
+        }
+
+        Menu {
+            title: qsTr("&Gate")
+            MenuItem {
+                action: acAddNotGate
+                font.pointSize: menuBar.fontSize
+                icon.color: "transparent"
+            }
+            MenuItem {
+                action: acAddAndGate
+                font.pointSize: menuBar.fontSize
+                icon.color: "transparent"
+            }
+            MenuItem {
+                action: acAddOrGate
+                font.pointSize: menuBar.fontSize
+                icon.color: "transparent"
+            }
+            MenuItem {
+                action: acAddXorGate
+                font.pointSize: menuBar.fontSize
+                icon.color: "transparent"
+            }
+
+            MenuSeparator {}
+
+            MenuItem {
+                action: acDelGate
+                font.pointSize: menuBar.fontSize
                 icon.color: "transparent"
             }
         }
@@ -187,6 +256,13 @@ ApplicationWindow {
             TButton {
                 action: acAddXorGate
                 tooltip:  qsTr("Create (N)XOR gate")
+            }
+
+            ToolSeparator { }
+
+            TButton {
+                action: acDelGate
+                tooltip:  qsTr("Delete selected gate")
             }
 
             ToolSeparator { }
@@ -553,6 +629,7 @@ ApplicationWindow {
                 updateCurrent()
             }
 
+            // remove from selected gates
             function delSelection(obj) {
                 var i = selection.indexOf(obj)
 
