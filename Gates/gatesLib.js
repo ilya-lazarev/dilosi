@@ -34,11 +34,37 @@ function createGate(par, args) {
 
         if (obj !== null) {
             obj.objectName = 'gate_' + args.type + '_' + gID++;
-            // Error Handling
             return obj;
         } else {
+            // Error Handling
             console.log("Error creating component: " + comp.errorString());
         }
     }
     return null;
+}
+
+// p1 <= p <= p2
+function between(p, p1, p2) {
+    return p1 <= p && p <= p2;
+}
+
+// all point of inner rect is inside outer rect
+function rectContains(outer, inner) {
+    var right = outer.x + outer.width,
+        bottom = outer.y + outer.height
+
+    return between(inner.x, outer.x, right) && between(inner.y, outer.y, bottom) &&
+            between(inner.x + inner.width, outer.x, right) &&
+            between(inner.y + inner.height, outer.y, bottom)
+}
+
+// any point of inner rect is inside outer rect
+function rectIntersects(outer, inner) {
+    var right = outer.x + outer.width,
+        bottom = outer.y + outer.height
+
+    if( between(inner.x, outer.x, right) && between(inner.y, outer.y, bottom) ) return true;
+    if( between(inner.x + inner.width, outer.x, right) && between(inner.y, outer.y, bottom) ) return true;
+    if( between(inner.x, outer.x, right) && between(inner.y + inner.height, outer.y, bottom) ) return true;
+    return between(inner.x + inner.width, outer.x, right) && between(inner.y + inner.height, outer.y, bottom);
 }
