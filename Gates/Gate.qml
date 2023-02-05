@@ -23,8 +23,8 @@ Item {
     readonly property int _ofs: 4
     readonly property int pinMinSpacing: implicitWidth / 3
 
-    x: gt.x
-    y: gt.y
+//    x: gt.x
+//    y: gt.y
 
     onXChanged: gt.x = x
     onYChanged: gt.y = y
