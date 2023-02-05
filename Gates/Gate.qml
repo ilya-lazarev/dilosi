@@ -56,7 +56,9 @@ Item {
 
     // input pins
     Repeater {
+        id: inPins
         model: gate.inputs
+
         delegate: Rectangle {
             color: '#00000000'
             border {

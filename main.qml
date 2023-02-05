@@ -366,7 +366,7 @@ ApplicationWindow {
             }
             Label {
                 id: xpos
-                text: sP.padding
+                text: '['
                 font.pointSize: sP.fontSize
             }
 
@@ -378,20 +378,21 @@ ApplicationWindow {
 
             Label {
                 id: ypos
-                text: ')'
+                text: ']'
                 font.pointSize: sP.fontSize
             }
             Image {
                 id: stImage
+                Layout.leftMargin: 12
                 source: 'qrc:/img/48x48/chip.png'
                 sourceSize.width: 20
                 mipmap: true
             }
 
-            Label {
+            Text  {
                 id: nGates
+                text: ii.gates.length + ' / ' + ii.selection.length
                 font.pointSize: sP.fontSize
-                text: '' + ii.gates.length + '/' + ii.selection.length
             }
 
             Pane {

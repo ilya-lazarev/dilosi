@@ -18,5 +18,6 @@
         <file>img/48x48/orGate.png</file>
         <file>img/48x48/xorGate.png</file>
         <file>img/24x24/edit-select-all.png</file>
+        <file>img/48x48/chip1.png</file>
     </qresource>
 </RCC>
