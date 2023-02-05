@@ -1,6 +1,6 @@
 QT += quick
 
-CONFIG += c++11 console
+CONFIG += c++11 #console
 #CONFIG += qmltypes
 
 # You can make your code fail to compile if it uses deprecated APIs.
