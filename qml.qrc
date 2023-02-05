@@ -10,11 +10,13 @@
         <file>img/svg/gate.svg</file>
         <file>img/svg/orGate.svg</file>
         <file>img/svg/xorGate.svg</file>
-        <file>img/24x24/andGate.png</file>
-        <file>img/24x24/gate.png</file>
-        <file>img/24x24/orGate.png</file>
-        <file>img/24x24/xorGate.png</file>
-        <file>img/24x24/notGate.png</file>
-        <file>img/24x24/deleteGate.png</file>
+        <file>img/48x48/andGate.png</file>
+        <file>img/48x48/chip.png</file>
+        <file>img/48x48/deleteGate.png</file>
+        <file>img/48x48/gate.png</file>
+        <file>img/48x48/notGate.png</file>
+        <file>img/48x48/orGate.png</file>
+        <file>img/48x48/xorGate.png</file>
+        <file>img/24x24/edit-select-all.png</file>
     </qresource>
 </RCC>
