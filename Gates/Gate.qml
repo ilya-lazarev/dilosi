@@ -11,7 +11,7 @@ Item {
     implicitWidth: 50
     property alias gate: gt
 
-    implicitHeight: gate.type == GateType.Not ? 50 : 60
+    implicitHeight: gate.type == GateType.Not ? width - rad*2 : 60
 
     property alias type: gt.type
     property alias inv: gt.inv
@@ -40,11 +40,12 @@ Item {
         visible: alert || selected
     }
 
+    // main rectangle
     Rectangle {
         id: baseRect
         color: '#00000000'
         implicitWidth: parent.width - rad*2
-        implicitHeight: gate.type == GateType.Not ? parent.width - rad*2 : parent.height
+        implicitHeight: gate.type == GateType.Not ? width : parent.height
         x: rad
         y: 0
         border {
@@ -65,7 +66,7 @@ Item {
 
             width: rad
             height: stroke
-            y: _ofs + baseRect._pinStep / (gate.inputs+1) * (index+1)
+            y: baseRect.height / (gate.inputs+1) * (index+1)
         }
     }
 

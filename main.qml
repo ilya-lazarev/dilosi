@@ -44,17 +44,19 @@ ApplicationWindow {
         return g;
     }
 
+    function loadFile() {
+        console.log("OpenFile")
+        var gg = iolib.loadFile();
+        for(var i in gg) {
+            newGate(gg[i].type, gg[i])
+        }
+    }
+
     Action {
         id: acFileOpen
         text: qsTr("&Open")
         shortcut: 'Ctrl+O'
-        onTriggered: {
-            console.log("OpenFile")
-            var gg = iolib.loadFile();
-            for(var i in gg) {
-                newGate(gg[i].type, gg[i])
-            }
-        }
+        onTriggered: loadFile()
         icon {
             source: 'qrc:/img/24x24/fileopen.png'
         }
@@ -347,6 +349,7 @@ ApplicationWindow {
                 z: ii.z + 1
                 color: "#66506add"
                 visible: false
+                radius: 6;
                 function moveAt(p1, p2) {
                     selp.x = Math.min(p1.x, p2.x)
                     selp.y = Math.min(p1.y, p2.y)
@@ -570,5 +573,6 @@ ApplicationWindow {
 
     Component.onCompleted: {
         GL.preload();
+        loadFile();
     }
 }
