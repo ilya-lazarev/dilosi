@@ -553,15 +553,8 @@ ApplicationWindow {
                             dragObj = obj
                             var di = ii.selection.indexOf(obj);
 
-                            if( ii.numSelection() > 0 && di != -1) { // obj is among already selected
-                                dragObj = null
-                                ii.selection.map( (x) => {
-                                        moveArr.push(ii.mapToItem(x, mouse.x, mouse.y))
-                                                     origP.push( (Qt.point(x.x, x.y)) )
-                                })
-                            }
-                            else
-                                op = ii.mapToItem(obj, mouse.x, mouse.y)
+                            // save original click position in gate coords
+                            op = ii.mapToItem(obj, mouse.x, mouse.y)
 
                             startP.x = obj.x
                             startP.y  = obj.y
@@ -590,11 +583,11 @@ ApplicationWindow {
                     if( mouse.button == Qt.LeftButton) {
                         if( dragObj && !moved ) {
                             if( ! dragObj.selected ) {
-                                ii.clearSelection()
+                                if( !(mouse.modifiers & Qt.ShiftModifier))
+                                    ii.clearSelection()
 
                                 ii.addSelection(dragObj)
                             } else {
-                                console.log("On selected")
                                 ii.delSelection(dragObj)
                             }
                         }
@@ -615,6 +608,7 @@ ApplicationWindow {
                             }
                             dragging = false
                             moveArr = []
+                            origP = []
                             ii.updateCurrent()
                         }
                     } else if(mouse.button == Qt.MiddleButton) {
@@ -627,8 +621,21 @@ ApplicationWindow {
                     if(dragObj || moveArr.length) {
                         if( !moved && Math.abs(pressP.x - mouse.x) < 4 && Math.abs(pressP.y - mouse.y < 4))
                             return;
-                        moved = true
+
+                        if( !moved ) {
+                            moved = true
+                            var di = ii.selection.indexOf(dragObj)
+                            if( ii.numSelection() > 0 && di > -1) { // obj is among already selected
+                                dragObj = null
+                                ii.selection.map( (x) => {
+                                        moveArr.push(ii.mapToItem(x, mouse.x, mouse.y))
+                                        origP.push( (Qt.point(x.x, x.y)) )
+                                })
+                            }
+                        }
                         dragging = true
+
+
                         if(moveArr.length) {
                             moveArr.map( (x, i) => {
                                     ii.selection[i].x = Math.round(mouse.x - x.x)
@@ -694,7 +701,6 @@ ApplicationWindow {
                 }
                 return false;
             }
-
         } // ii
     } // cona
 
