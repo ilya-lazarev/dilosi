@@ -36,7 +36,6 @@ ApplicationWindow {
         return g;
     }
 
-
     function deleteGates(list) {
         list.map( (x) =>  {
                      var s = ii.gates.indexOf(x)
@@ -58,7 +57,7 @@ ApplicationWindow {
         }
     }
 
-    Action {
+    TAction {
         id: acFileOpen
 
         text: qsTr("&Open")
@@ -69,7 +68,7 @@ ApplicationWindow {
         }
     }
 
-    Action {
+    TAction {
         id: acFileSave
 
         text: qsTr("&Save")
@@ -83,7 +82,7 @@ ApplicationWindow {
         }
     }
 
-    Action {
+    TAction {
         id: acAppExit
 
         text: qsTr("&Quit")
@@ -94,7 +93,7 @@ ApplicationWindow {
         }
     }
 
-    Action {
+    TAction {
         id: acSelectAll
 
         text: qsTr("Select all")
@@ -105,7 +104,7 @@ ApplicationWindow {
         }
     }
 
-    Action {
+    TAction {
         id: acAddAndGate
 
         text: qsTr("Add (N)AND gate")
@@ -113,10 +112,9 @@ ApplicationWindow {
         shortcut: 'Ctrl+1'
         icon {
             source: 'qrc:/img/48x48/andGate.png'
-            color: 'transparent'
         }
     }
-    Action {
+    TAction {
         id: acAddOrGate
 
         text: qsTr("Add (N)OR gate")
@@ -124,10 +122,9 @@ ApplicationWindow {
         shortcut: 'Ctrl+2'
         icon {
             source: 'qrc:/img/48x48/orGate.png'
-            color: 'transparent'
         }
     }
-    Action {
+    TAction {
         id: acAddXorGate
 
         text: qsTr("Add (N)XOR gate")
@@ -135,11 +132,10 @@ ApplicationWindow {
         shortcut: 'Ctrl+3'
         icon {
             source: 'qrc:/img/48x48/xorGate.png'
-            color: 'transparent'
         }
     }
 
-    Action {
+    TAction {
         id: acAddNotGate
 
         text: qsTr("Add NOT/REPEATER gate")
@@ -147,11 +143,10 @@ ApplicationWindow {
         shortcut: 'Ctrl+4'
         icon {
             source: 'qrc:/img/48x48/notGate.png'
-            color: 'transparent'
         }
     }
 
-    Action {
+    TAction {
         id: acDelGate
 
         enabled: ii.selection.length > 0
@@ -163,7 +158,6 @@ ApplicationWindow {
         shortcut: 'Del'
         icon {
             source: 'qrc:/img/48x48/deleteGate.png'
-            color: 'transparent'
         }
     }
 
@@ -174,65 +168,65 @@ ApplicationWindow {
 
         Menu {
             title: qsTr("&File")
-            MenuItem {
+            TMenuItem {
                 action: acFileOpen
-                font.pointSize: menuBar.fontSize
+                fSize: menuBar.fontSize
                 icon.color: "transparent"
             }
-            MenuItem {
+            TMenuItem {
                 action: acFileSave
-                font.pointSize: menuBar.fontSize
+                fSize: menuBar.fontSize
                 icon.color: "transparent"
             }
 
             MenuSeparator {}
 
-            MenuItem {
+            TMenuItem {
                 action: acAppExit
-                icon.color: "transparent"
-                font.pointSize: menuBar.fontSize
+                icon.color: action.icon.color
+                fSize: menuBar.fontSize
             }
         }
 
         Menu {
             title: qsTr("&Edit")
 
-            MenuItem {
+            TMenuItem {
                 action: acSelectAll
-                font.pointSize: menuBar.fontSize
+                fSize: menuBar.fontSize
                 icon.color: "transparent"
             }
         }
 
         Menu {
             title: qsTr("&Gate")
-            MenuItem {
+            TMenuItem {
                 action: acAddNotGate
-                font.pointSize: menuBar.fontSize
+                fSize: menuBar.fontSize
                 icon.color: "transparent"
             }
-            MenuItem {
+            TMenuItem {
                 action: acAddAndGate
-                font.pointSize: menuBar.fontSize
+                fSize: menuBar.fontSize
                 icon.color: "transparent"
             }
-            MenuItem {
+            TMenuItem {
                 action: acAddOrGate
-                font.pointSize: menuBar.fontSize
+                fSize: menuBar.fontSize
                 icon.color: "transparent"
             }
-            MenuItem {
+            TMenuItem {
                 action: acAddXorGate
-                font.pointSize: menuBar.fontSize
+                fSize: menuBar.fontSize
                 icon.color: "transparent"
             }
 
             MenuSeparator {}
 
-            MenuItem {
+            TMenuItem {
                 action: acDelGate
-                font.pointSize: menuBar.fontSize
-                icon.color: "transparent"
+                fSize: menuBar.fontSize
+                icon.color: action.icon.color
             }
         }
     }
@@ -280,9 +274,7 @@ ApplicationWindow {
 
             TButton {
                 action: acDelGate
-                enabled: acDelGate.enabled
                 tooltip:  qsTr("Delete selected gate")
-//                enabled: ii.selection.length > 0
             }
 
             ToolSeparator { }
@@ -533,7 +525,6 @@ ApplicationWindow {
                 hoverEnabled: true
 
                 property bool dragging: false
-//                property var current: null
                 property var dragObj: null
                 property point op: Qt.point(0,0)
                 property bool moved: false
@@ -543,6 +534,9 @@ ApplicationWindow {
                 property point pressP: Qt.point(0,0)
                 property var moveArr: []
                 property var origP: []
+                property int dragInPin: -1
+                property int dragOutPin: -1
+                property int dragIndex: -1
 
                 onPressed: {
                     if( mouse.button == Qt.LeftButton) {
@@ -552,10 +546,24 @@ ApplicationWindow {
 
                         if(obj !== null && obj.objectName.startsWith("gate_")) {
                             dragObj = obj
-                            var di = ii.selection.indexOf(obj);
+                            dragIndex = ii.selection.indexOf(obj);
 
                             // save original click position in gate coords
                             op = ii.mapToItem(obj, mouse.x, mouse.y)
+
+                            // clicked on gate check whether clicked on inputs or output
+                            if( dragObj.isInputsArea(op)) {
+                                status.text = "Clicked inputs"
+                                var i = dragObj.inPinNumber(op.y)
+                                if( i >= 0 ) {
+                                    status.text = "Clicked input "+i
+                                    dragObj.hilited = i
+                                    dragInPin = i
+                                }
+                            } else if( dragObj.isOutputArea(op)) {
+                                dragOutPin = true
+                                status.text = "Clicked OUTputs"
+                            }
 
                             startP.x = obj.x
                             startP.y  = obj.y
@@ -584,17 +592,7 @@ ApplicationWindow {
                     if( mouse.button == Qt.LeftButton) {
                         if( dragObj && !moved ) {
 
-                            // clicked on gate check whether clicked on inputs or output
-                            if( dragObj.isInputsArea(op)) {
-                                status.text = "Clicked inputs"
-                                var i = dragObj.inPinNumber(op.y)
-                                if( i >= 0 ) {
-                                    status.text = "Clicked input "+i
-                                    dragObj.hilited = i
-                                }
-                            } else if( dragObj.isOutputArea(op)) {
-                                status.text = "Clicked OUTputs"
-                            } else if( ! dragObj.selected ) {
+                            if( ! dragObj.selected ) {
                                 if( !(mouse.modifiers & Qt.ShiftModifier))
                                     ii.clearSelection()
 
@@ -632,13 +630,12 @@ ApplicationWindow {
                 onPositionChanged: {
                     if(dragObj || moveArr.length) {
                         var deltaMove = 2*ii.scaleF
-                        if( !moved && Math.abs(pressP.x - mouse.x) < deltaMove && Math.abs(pressP.y - mouse.y < deltaMove))
+                        if( !moved && Math.abs(pressP.x - mouse.x) < deltaMove && Math.abs(pressP.y - mouse.y) < deltaMove)
                             return;
 
                         if( !moved ) {
                             moved = true
-                            var di = ii.selection.indexOf(dragObj)
-                            if( ii.numSelection() > 0 && di > -1) { // obj is among already selected
+                            if( ii.numSelection() > 0 && dragIndex > -1) { // obj is among already selected
 
                                 // adjust by distance dragged from 1st button press
                                 var dp = ii.mapToItem(dragObj, mouse.x, mouse.y)

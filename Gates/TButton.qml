@@ -5,7 +5,7 @@ ToolButton {
     id: tb
     property string tooltip
     display: AbstractButton.IconOnly
-    icon.color: "transparent"
+    icon.color: tb.enabled ? '#00000000' : '#aa555555'
     hoverEnabled: true
 
     ToolTip {

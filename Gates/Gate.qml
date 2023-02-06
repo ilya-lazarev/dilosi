@@ -31,14 +31,14 @@ Item {
     onYChanged: gt.y = y
 
     function isInputsArea(point) {
-        dp.text = Math.round(point.x)+'\n'+Math.round(point.y)
+//        dp.text = Math.round(point.x)+'\n'+Math.round(point.y)
         if(point.x>=0 && point.x <=baseRect.x+2 && point.y >= inPins.getInY(0) - 2 && point.y<=inPins.getInY(inputs-1) + 2)
             return true;
         return false
     }
 
     function isOutputArea(point) {
-        dp.text = Math.round(point.x) + '\n' + Math.round(point.y)
+//        dp.text = Math.round(point.x) + '\n' + Math.round(point.y)
         return point.x>=outPin.x  && point.x <= root.width && point.y >= outPin.y - stroke && point.y <= outPin.y + 2*stroke
     }
 
@@ -89,7 +89,7 @@ Item {
         delegate: Rectangle {
             color: '#00000000'
             border {
-                color: index == inPins.hilited ? '#2233FF' : '#000000'
+                color: index == inPins.hilited ? '#FFAA22' : '#000000'
                 width: stroke
             }
 
@@ -134,10 +134,10 @@ Item {
         y: rad
         font.pixelSize: root.height / 4
     }
-    Label {
-        id: dp
-        font.pixelSize: 10
-        x: label.x
-        anchors.top: label.bottom
-    }
+//    Label {
+//        id: dp
+//        font.pixelSize: 10
+//        x: label.x
+//        anchors.top: label.bottom
+//    }
 }

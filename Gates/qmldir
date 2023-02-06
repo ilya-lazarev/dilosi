@@ -6,3 +6,5 @@ GXor 1.0 GXor.qml
 GNot 1.0 GNot.qml
 TButton 1.0 TButton.qml
 GL 1.0 gatesLib.js
+TMenuItem 1.0 TMenuItem.qml
+TAction 1.0 TAction.qml

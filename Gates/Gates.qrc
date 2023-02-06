@@ -8,5 +8,7 @@
         <file>gatesLib.js</file>
         <file>GNot.qml</file>
         <file>TButton.qml</file>
+        <file>TMenuItem.qml</file>
+        <file>TAction.qml</file>
     </qresource>
 </RCC>
