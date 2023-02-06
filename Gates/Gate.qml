@@ -22,12 +22,33 @@ Item {
     property bool selected: false
     readonly property int _ofs: 4
     readonly property int pinMinSpacing: implicitWidth / 3
+    property alias hilited: inPins.hilited
 
 //    x: gt.x
 //    y: gt.y
 
     onXChanged: gt.x = x
     onYChanged: gt.y = y
+
+    function isInputsArea(point) {
+        dp.text = Math.round(point.x)+'\n'+Math.round(point.y)
+        if(point.x>=0 && point.x <=baseRect.x+2 && point.y >= inPins.getInY(0) - 2 && point.y<=inPins.getInY(inputs-1) + 2)
+            return true;
+        return false
+    }
+
+    function isOutputArea(point) {
+        dp.text = Math.round(point.x) + '\n' + Math.round(point.y)
+        return point.x>=outPin.x  && point.x <= root.width && point.y >= outPin.y - stroke && point.y <= outPin.y + 2*stroke
+    }
+
+    function inPinNumber(y) {
+        for( var i = 0; i < inputs; ++i ) {
+            if( Math.abs(y - inPins.getInY(i)) < stroke + 2)
+                return i
+        }
+        return -1
+    }
 
     // dimmer - alert,selcted
     Rectangle {
@@ -57,18 +78,24 @@ Item {
     // input pins
     Repeater {
         id: inPins
+
+        property int hilited: -1
         model: gate.inputs
+
+        function getInY(i) {
+            return baseRect.height / (gate.inputs+1) * (i+1) + stroke/2
+        }
 
         delegate: Rectangle {
             color: '#00000000'
             border {
-                color: '#000000'
+                color: index == inPins.hilited ? '#2233FF' : '#000000'
                 width: stroke
             }
 
             width: rad
             height: stroke
-            y: baseRect.height / (gate.inputs+1) * (index+1)
+            y: inPins.getInY(index) - stroke/2
         }
     }
 
@@ -106,5 +133,11 @@ Item {
         x: 2*rad + stroke
         y: rad
         font.pixelSize: root.height / 4
+    }
+    Label {
+        id: dp
+        font.pixelSize: 10
+        x: label.x
+        anchors.top: label.bottom
     }
 }

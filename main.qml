@@ -583,7 +583,18 @@ ApplicationWindow {
                 onClicked: {
                     if( mouse.button == Qt.LeftButton) {
                         if( dragObj && !moved ) {
-                            if( ! dragObj.selected ) {
+
+                            // clicked on gate check whether clicked on inputs or output
+                            if( dragObj.isInputsArea(op)) {
+                                status.text = "Clicked inputs"
+                                var i = dragObj.inPinNumber(op.y)
+                                if( i >= 0 ) {
+                                    status.text = "Clicked input "+i
+                                    dragObj.hilited = i
+                                }
+                            } else if( dragObj.isOutputArea(op)) {
+                                status.text = "Clicked OUTputs"
+                            } else if( ! dragObj.selected ) {
                                 if( !(mouse.modifiers & Qt.ShiftModifier))
                                     ii.clearSelection()
 
@@ -620,16 +631,22 @@ ApplicationWindow {
 
                 onPositionChanged: {
                     if(dragObj || moveArr.length) {
-                        if( !moved && Math.abs(pressP.x - mouse.x) < 4 && Math.abs(pressP.y - mouse.y < 4))
+                        var deltaMove = 2*ii.scaleF
+                        if( !moved && Math.abs(pressP.x - mouse.x) < deltaMove && Math.abs(pressP.y - mouse.y < deltaMove))
                             return;
 
                         if( !moved ) {
                             moved = true
                             var di = ii.selection.indexOf(dragObj)
                             if( ii.numSelection() > 0 && di > -1) { // obj is among already selected
+
+                                // adjust by distance dragged from 1st button press
+                                var dp = ii.mapToItem(dragObj, mouse.x, mouse.y)
+                                dp.x -= op.x; dp.y -= op.y
+
                                 dragObj = null
                                 ii.selection.map( (x) => {
-                                        moveArr.push(ii.mapToItem(x, mouse.x, mouse.y))
+                                        moveArr.push(ii.mapToItem(x, mouse.x - dp.x, mouse.y - dp.y))
                                         origP.push( (Qt.point(x.x, x.y)) )
                                 })
                             }
@@ -645,6 +662,7 @@ ApplicationWindow {
                             ii.selection.map( x => x.alert = ii.checkOverlap(x) )
                         }
                         else {
+                            // move not selected
                             dragObj.x = Math.round(mouse.x - op.x)
                             dragObj.y = Math.round(mouse.y - op.y)
                             dragObj.alert = ii.checkOverlap(dragObj)
