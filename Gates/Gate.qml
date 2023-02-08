@@ -44,10 +44,22 @@ Item {
 
     function inPinNumber(y) {
         for( var i = 0; i < inputs; ++i ) {
-            if( Math.abs(y - inPins.getInY(i)) < stroke + 2)
+            if( Math.abs(y - inPins.getInY(i)) < inPins.gapY - 4)
                 return i
         }
         return -1
+    }
+
+    function getInPinPoint(pin) {
+        if( pin <0 || pin >= inputs ) {
+            return null
+        }
+        var x = 0, y = inPins.getInY(pin)
+        return Qt.point(x, y)
+    }
+
+    function getOutPinPoint() {
+        return Qt.point(width-1, outPin.y)
     }
 
     // dimmer - alert,selcted
@@ -80,10 +92,11 @@ Item {
         id: inPins
 
         property int hilited: -1
+        property int gapY: baseRect.height / (gate.inputs+1)
         model: gate.inputs
 
         function getInY(i) {
-            return baseRect.height / (gate.inputs+1) * (i+1) + stroke/2
+            return gapY * (i+1) + stroke/2
         }
 
         delegate: Rectangle {

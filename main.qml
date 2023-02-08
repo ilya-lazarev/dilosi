@@ -3,6 +3,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.3
+import QtQuick.Shapes 1.15
 import Gates 1.0
 import gates.org 1.0
 
@@ -411,6 +412,7 @@ ApplicationWindow {
             property int scX: 0 // scale center x
             property int scY: 0 // scale center y
             property var current: null
+            property alias shape: shape
 
             anchors.fill: parent
             anchors.centerIn: parent
@@ -518,6 +520,23 @@ ApplicationWindow {
                 }
             }
 
+            Shape {
+                id: shape
+                asynchronous: true
+                anchors.fill: parent
+                visible: true
+
+                ShapePath {
+                    id: spath
+                    startX: mArea.pressP.x
+                    startY: mArea.pressP.y
+                    PathLine {
+                        x: mArea.mouseX
+                        y: mArea.mouseY
+                    }
+                }
+            }
+
             MouseArea {
                 id: mArea
                 acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
@@ -526,17 +545,17 @@ ApplicationWindow {
 
                 property bool dragging: false
                 property var dragObj: null
-                property point op: Qt.point(0,0)
+                property point op: Qt.point(0,0) // local offset in gate of mouse click point
                 property bool moved: false
                 property bool panning: false
-                property point startP: Qt.point(0,0)
-                property point centerP: Qt.point(0,0)
-                property point pressP: Qt.point(0,0)
+                property point startP: Qt.point(0,0) // orig position of single gate being moved
+                property point centerP: Qt.point(0,0) // transform scale origin
+                property point pressP: Qt.point(0,0) // original mouse click point
                 property var moveArr: []
-                property var origP: []
-                property int dragInPin: -1
-                property int dragOutPin: -1
-                property int dragIndex: -1
+                property var origP: [] // original position of gates being moved
+                property int dragInPin: -1 // clicked in pin number
+                property bool dragOutPin: false // whether clicked output pin
+                property int dragIndex: -1 // index in selection array of clicked gate
 
                 onPressed: {
                     if( mouse.button == Qt.LeftButton) {
@@ -551,7 +570,7 @@ ApplicationWindow {
                             // save original click position in gate coords
                             op = ii.mapToItem(obj, mouse.x, mouse.y)
 
-                            // clicked on gate check whether clicked on inputs or output
+                            // clicked on gate, check whether clicked on inputs or output
                             if( dragObj.isInputsArea(op)) {
                                 status.text = "Clicked inputs"
                                 var i = dragObj.inPinNumber(op.y)
@@ -624,6 +643,8 @@ ApplicationWindow {
                     } else if(mouse.button == Qt.MiddleButton) {
                         panning = false
                     }
+                    dragInPin = -1
+                    dragOutPin = false
                     selp.visible = false
                 }
 
@@ -650,8 +671,11 @@ ApplicationWindow {
                         }
                         dragging = true
 
-
-                        if(moveArr.length) {
+                        if( dragInPin > -1 || dragOutPin ) { // trace wire
+                            // draw line
+                            ii.shape.data[0].pathElements[0].x = mouse.x
+                            ii.shape.data[0].pathElements[0].y = mouse.y
+                        } else if(moveArr.length) { // move selected
                             moveArr.map( (x, i) => {
                                     ii.selection[i].x = Math.round(mouse.x - x.x)
                                     ii.selection[i].y = Math.round(mouse.y - x.y)
