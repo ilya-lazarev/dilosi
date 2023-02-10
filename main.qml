@@ -361,7 +361,9 @@ ApplicationWindow {
 
             Text  {
                 id: tHint
+                smooth: true
                 font.pointSize: sP.fontSize
+                renderType: Text.NativeRendering
             }
         }
     }
@@ -493,16 +495,16 @@ ApplicationWindow {
                 id: shape
                 asynchronous: true
                 anchors.fill: parent
-                visible: true
+                visible: false
 
                 ShapePath {
                     id: spath
                     startX: mArea.pressP.x
                     startY: mArea.pressP.y
-                    PathLine {
-                        x: mArea.mouseX
-                        y: mArea.mouseY
-                    }
+
+                    strokeWidth: 3
+                    strokeStyle: ShapePath.DashLine
+                    PathLine { }
                 }
             }
 
@@ -548,9 +550,11 @@ ApplicationWindow {
                                     dragObj.hilited = i
                                     dragInPin = i
                                 }
+                                ii.shape.visible = true
                             } else if( dragObj.isOutputArea(op)) {
                                 dragOutPin = true
                                 status.text = "Clicked OUTputs"
+                                ii.shape.visible = true
                             }
 
                             startP.x = obj.x
@@ -570,6 +574,8 @@ ApplicationWindow {
                             selp.moveAt(startP, mouse)
                             selp.visible = true
                         }
+                        ii.shape.data[0].startX = mouse.x
+                        ii.shape.data[0].startY = mouse.y
                         pressP.x = mouse.x
                         pressP.y = mouse.y
 
@@ -621,6 +627,7 @@ ApplicationWindow {
                     dragOutPin = false
                     selp.visible = false
                     tHint.text = ''
+                    ii.shape.visible = false
                 }
 
                 onPositionChanged: {
