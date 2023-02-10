@@ -169,66 +169,30 @@ ApplicationWindow {
 
         Menu {
             title: qsTr("&File")
-            TMenuItem {
-                action: acFileOpen
-                fSize: menuBar.fontSize
-                icon.color: "transparent"
-            }
-            TMenuItem {
-                action: acFileSave
-                fSize: menuBar.fontSize
-                icon.color: "transparent"
-            }
+            TMenuItem { action: acFileOpen }
+            TMenuItem { action: acFileSave }
 
             MenuSeparator {}
 
-            TMenuItem {
-                action: acAppExit
-                icon.color: action.icon.color
-                fSize: menuBar.fontSize
-            }
+            TMenuItem { action: acAppExit }
         }
 
         Menu {
             title: qsTr("&Edit")
 
-            TMenuItem {
-                action: acSelectAll
-                fSize: menuBar.fontSize
-                icon.color: "transparent"
-            }
+            TMenuItem { action: acSelectAll }
         }
 
         Menu {
             title: qsTr("&Gate")
-            TMenuItem {
-                action: acAddNotGate
-                fSize: menuBar.fontSize
-                icon.color: "transparent"
-            }
-            TMenuItem {
-                action: acAddAndGate
-                fSize: menuBar.fontSize
-                icon.color: "transparent"
-            }
-            TMenuItem {
-                action: acAddOrGate
-                fSize: menuBar.fontSize
-                icon.color: "transparent"
-            }
-            TMenuItem {
-                action: acAddXorGate
-                fSize: menuBar.fontSize
-                icon.color: "transparent"
-            }
+            TMenuItem { action: acAddNotGate }
+            TMenuItem { action: acAddAndGate }
+            TMenuItem { action: acAddOrGate }
+            TMenuItem { action: acAddXorGate }
 
             MenuSeparator {}
 
-            TMenuItem {
-                action: acDelGate
-                fSize: menuBar.fontSize
-                icon.color: action.icon.color
-            }
+            TMenuItem { action: acDelGate }
         }
     }
 
