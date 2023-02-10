@@ -394,6 +394,11 @@ ApplicationWindow {
                 Layout.fillWidth: true
 //                implicitHeight: ypos.height
             }
+
+            Text  {
+                id: tHint
+                font.pointSize: sP.fontSize
+            }
         }
     }
 
@@ -587,8 +592,13 @@ ApplicationWindow {
                             startP.x = obj.x
                             startP.y  = obj.y
                         } else {
-                            // clear selection
-                            ii.clearSelection()
+                            // Start selection rectangle
+
+                            tHint.text = qsTr("Use Shift to expand selection, Control to contract selection")
+                            // Shift to add to selection, Control to remove from selection
+                            if( ! (mouse.modifiers & (Qt.ControlModifier | Qt.ShiftModifier)) )
+                                // clear selection
+                                ii.clearSelection()
                             dragObj = null
                             dragging = false
                             startP.x = mouse.x
@@ -627,7 +637,7 @@ ApplicationWindow {
 
                 onReleased: {
                     if( mouse.button == Qt.LeftButton) {
-                        if(dragObj || moveArr.length) {
+                        if(dragObj || moveArr.length) { // Moving selected gates
                             if( moveArr.length ) {
                                 ii.selection.map( (x, i) => { if( ii.checkOverlap(x) ) { x.x = origP[i].x; x.y = origP[i].y; x.alert = false }} )
                             } else if( ii.checkOverlap(dragObj) )  {
@@ -646,6 +656,7 @@ ApplicationWindow {
                     dragInPin = -1
                     dragOutPin = false
                     selp.visible = false
+                    tHint.text = ''
                 }
 
                 onPositionChanged: {
@@ -699,12 +710,19 @@ ApplicationWindow {
                     } else if(mouse.buttons & Qt.LeftButton && selp.visible) {
                         // Update selection rectangle
                         selp.moveAt(startP, mouse)
-                        ii.clearSelection()
 
-                        var checkFunction = GL.rectIntersects
-                        if( mouse.modifiers & Qt.ShiftModifier )
+                        var checkFunction = GL.rectIntersects, selFunction = ii.addSelection
+
+                        if( ! (mouse.modifiers & (Qt.ShiftModifier | Qt.ControlModifier)) )
+                            ii.clearSelection()
+
+                        if( mouse.modifiers & Qt.AltModifier )
                             checkFunction = GL.rectContains
-                        ii.gates.map( x => checkFunction(selp, x) ? ii.addSelection(x) : null)
+
+                        if( mouse.modifiers & Qt.ControlModifier )
+                            selFunction = ii.delSelection
+
+                        ii.gates.map( x => checkFunction(selp, x) ? selFunction(x) : null)
                     }
                 }
 
